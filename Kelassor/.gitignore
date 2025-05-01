@@ -41,3 +41,4 @@ config/settings_local.py
 !**/migrations/__init__.py
 
 .env
+env 
