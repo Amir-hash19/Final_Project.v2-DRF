@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'Kelassor.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "Kelassor",
+        "NAME": "kelassor",
         "USER": "admin",
         "PASSWORD": "amir112233",
         "HOST": "localhost",
