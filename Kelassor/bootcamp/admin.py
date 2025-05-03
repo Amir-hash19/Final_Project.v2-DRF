@@ -1,3 +1,10 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+
+
+admin.site.register(Bootcamp)
+admin.site.register(BootcampCategory)
+admin.site.register(SMSLog)
+admin.site.register(BootcampRegistration)
+
