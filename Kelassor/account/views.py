@@ -1,10 +1,11 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .OTPThrottle import OTPThrottle
+from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import Group
 from .models import CustomUser
 from .serializers import (CreateAccountSerializer, EditAccountSerializer, CustomAccountSerializer,
-                           ListSupportPanelSerializer, OTPSerializer, VerifyOTPSerializer, PromoteUserSerializer)
+                           SupportPanelSerializer, OTPSerializer, VerifyOTPSerializer, PromoteUserSerializer)
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -90,7 +91,7 @@ class DetailAccountView(RetrieveAPIView):
 class ListSupportAccountView(ListAPIView):
     queryset = CustomUser.objects.filter(groups__name__in=["SupportPanel"])
     permission_classes = [IsAuthenticated,GroupPermission("SupportPanel", "SuperUser")]
-    serializer_class = ListSupportPanelSerializer
+    serializer_class = SupportPanelSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["date_joined", "phone", "username", "last_name"]
@@ -205,3 +206,23 @@ class PromoteUserView(APIView):
 
         
 
+
+
+class DeleteSupportPanelView(DestroyAPIView):
+    queryset = CustomUser.objects.all()
+    permission_classes = [IsAuthenticated, GroupPermission("SuperUser")]
+    serializer_class = SupportPanelSerializer
+
+
+    def perform_destroy(self, instance):
+        if self.request.user == instance:
+            raise ValidationError("You Cannot Delete your own account from here!")
+        
+
+
+class LogOutAdminView(APIView):
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+
+    def post(self, request):
+        # request.user.auth_token.delete()
+        return Response({"details":"User Logged Out Successfully!"})
