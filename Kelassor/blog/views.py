@@ -96,8 +96,23 @@ class DetailBlogView(RetrieveAPIView):
 
 
 class ListBlogView(ListAPIView):
-    queryset = Blog.objects.all()
+    queryset = Blog.objects.filter(status="published")
     permission_classes = [IsAuthenticated]
+    serializer_class = BlogSerializer
+    pagination_class = CustomPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["title", "status", "content"]
+    filterset_fields = ["status", "date_added"]
+    ordering_fields = ["-date_added"]
+
+
+
+
+
+
+class AdminListBlogView(ListAPIView):
+    queryset = Blog.objects.all()
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = BlogSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
