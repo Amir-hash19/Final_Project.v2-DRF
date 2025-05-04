@@ -1,10 +1,13 @@
 from django.urls import path
-from .views import AddCategoryBlogView, UploadBlogView, DeleteCategoryBlogView
+from .views import AddCategoryBlogView, UploadBlogView, DeleteCategoryBlogView, ListCateogryBlogView, EditBlogView, DeleteBlogView
 
 
 
 urlpatterns = [
     path("add-category/", AddCategoryBlogView.as_view(), name="create-category-blog"),
     path("upload-blog/", UploadBlogView.as_view(), name="create-blog"),
-    path("delete-category/<int:pk>", DeleteCategoryBlogView.as_view(), name="delete-category-blog")
+    path("delete-category/<int:pk>", DeleteCategoryBlogView.as_view(), name="delete-category-blog"),
+    path("list-category-blogs/", ListCateogryBlogView.as_view(), name="list-category-blog"),
+    path("edit-blog/", EditBlogView.as_view(), name="edit-blog-adminsupport"),
+    path("delete-blog/", DeleteBlogView.as_view(), name="delete-blog")
 ]
