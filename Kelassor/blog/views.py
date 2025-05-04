@@ -1,8 +1,8 @@
-from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from account.permissions import GroupPermission
 from rest_framework.views import APIView
-from .serializers import BlogCategorySerializer, UploadBlogSerializer
+from .serializers import BlogCategorySerializer, UploadBlogSerializer, BlogSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import CategoryBlog, Blog
@@ -79,3 +79,28 @@ class DeleteBlogView(DestroyAPIView):
 
     def get_queryset(self):
         return Blog.objects.filter(user=self.request.user)
+    
+
+
+
+
+
+class DetailBlogView(RetrieveAPIView):
+    queryset = Blog.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = UploadBlogSerializer
+
+
+
+
+
+
+class ListBlogView(ListAPIView):
+    queryset = Blog.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = BlogSerializer
+    pagination_class = CustomPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["title", "status", "content"]
+    filterset_fields = ["status", "date_added"]
+    ordering_fields = ["-date_added"]
