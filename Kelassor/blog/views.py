@@ -3,8 +3,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from account.permissions import GroupPermission
 from rest_framework.views import APIView
 from .serializers import BlogCategorySerializer, UploadBlogSerializer
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import CategoryBlog, Blog
-
+from account.views import CustomPagination
 
 
 
@@ -41,4 +43,39 @@ class DeleteCategoryBlogView(DestroyAPIView):
     serializer_class = BlogCategorySerializer
 
 
-   
+
+
+
+
+class ListCateogryBlogView(ListAPIView):
+    queryset = CategoryBlog.objects.all()
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    serializer_class = BlogCategorySerializer
+    pagination_class = CustomPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["name"]
+    filterset_fields = ["date_joined"]
+
+    
+
+
+
+class EditBlogView(UploadBlogView):
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    serializer_class = UploadBlogSerializer
+
+    def get_queryset(self):
+        return Blog.objects.filter(uploaded_by=self.request.user)
+
+
+
+
+
+
+
+class DeleteBlogView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    serializer_class = UploadBlogSerializer
+
+    def get_queryset(self):
+        return Blog.objects.filter(user=self.request.user)

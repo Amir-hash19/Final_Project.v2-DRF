@@ -19,3 +19,5 @@ class UploadBlogSerializer(serializers.ModelSerializer):
         model = Blog
         fields = ['title', 'content', 'slug', 'blogcategory', 'uploaded_by']
         read_only_fields = ['uploaded_by'] 
+
+        
