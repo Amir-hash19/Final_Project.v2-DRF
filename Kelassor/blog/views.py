@@ -22,8 +22,6 @@ class AddCategoryBlogView(CreateAPIView):
 
 
 
-
-
 class UploadBlogView(CreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = UploadBlogSerializer
@@ -31,5 +29,16 @@ class UploadBlogView(CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(
-            user = self.request.user
+            uploaded_by = self.request.user
         )
+
+
+
+
+class DeleteCategoryBlogView(DestroyAPIView):
+    queryset = CategoryBlog.objects.all()
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    serializer_class = BlogCategorySerializer
+
+
+   
