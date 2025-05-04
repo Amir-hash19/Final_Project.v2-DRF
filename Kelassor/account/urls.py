@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (CreateAccountUserView, EditAccountView, LogOutView, DeleteAccountView, DetailAccountView, 
-                    ListSupportAccountView, SendOTPLogInView, VerifyOTPView, PromoteUserView)
+                    ListSupportAccountView, SendOTPLogInView, VerifyOTPView, PromoteUserView, DeleteSupportPanelView, LogOutAdminView)
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -13,6 +13,8 @@ urlpatterns = [
     path("list-supportpanel-user/", ListSupportAccountView.as_view(), name="list-supportpanel-user"),
     path("loggin/", SendOTPLogInView.as_view(), name="send-otp"),
     path("verify-code/", VerifyOTPView.as_view(), name="verify-otp"),
-    path("promote-to-superuser/", PromoteUserView.as_view(), name="change-to-superuser")
+    path("promote-to-superuser/", PromoteUserView.as_view(), name="change-to-superuser"),
+    path("delete-supportpanel-user/<int:pk>/", DeleteSupportPanelView.as_view(), name="delete-supportpanel-user-by-superuser"),
+    path("logout-admin/", LogOutAdminView.as_view(), name="logout-admin-view")
 
 ]    

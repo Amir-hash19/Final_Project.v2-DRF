@@ -81,7 +81,7 @@ class CustomAccountSerializer(ModelSerializer):
 
 
 
-class ListSupportPanelSerializer(ModelSerializer):
+class SupportPanelSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = "__all__"
