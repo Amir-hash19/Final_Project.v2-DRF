@@ -106,4 +106,20 @@ class OTPSerializer(serializers.Serializer):
 class VerifyOTPSerializer(serializers.Serializer):
     phone = PhoneNumberField(region="IR")
     otp = serializers.CharField(max_length=6)
-    
+
+
+
+
+class PromoteUserSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+
+    def validate_email(self, value):
+        value = value.lower().strip()
+        if not value:
+            raise serializers.ValidationError("email Can not be empty!")
+        return value
+        
+
+
+ 

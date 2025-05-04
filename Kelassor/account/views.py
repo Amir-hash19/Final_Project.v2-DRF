@@ -1,8 +1,10 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .OTPThrottle import OTPThrottle
+from django.contrib.auth.models import Group
 from .models import CustomUser
-from .serializers import CreateAccountSerializer, EditAccountSerializer, CustomAccountSerializer, ListSupportPanelSerializer, OTPSerializer, VerifyOTPSerializer
+from .serializers import (CreateAccountSerializer, EditAccountSerializer, CustomAccountSerializer,
+                           ListSupportPanelSerializer, OTPSerializer, VerifyOTPSerializer, PromoteUserSerializer)
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -165,3 +167,41 @@ class VerifyOTPView(APIView):
                 return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+
+class PromoteUserView(APIView):
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+
+    
+    def post(self, request):
+        serializer = PromoteUserSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data["email"]
+           
+            
+            try:
+                user = CustomUser.objects.get(email__iexact=email)
+            except CustomUser.DoesNotExist:
+                return Response({"detail": "email does not exis!"}, status=status.HTTP_404_NOT_FOUND)
+            
+            if user.is_superuser:
+                return Response({"detail":"This User Already is SuperUser!"})
+
+            user.is_superuser = True
+            user.is_staff = True
+            user.save()
+
+            group, _ = Group.objects.get_or_create(name='SupportPanel')
+            user.groups.add(group)
+
+            return Response({
+                "detail": f"Client {user.email} has been promoted successfully."
+            }, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        
+

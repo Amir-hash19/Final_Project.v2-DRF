@@ -222,3 +222,10 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 86400.0,
     },
 }    
+
+
+
+
+
+KAVENEGAR_API_KEY = config('KAVENEGAR_API_KEY')
+KAVENEGAR_SENDER = config('KAVENEGAR_SENDER')
