@@ -175,3 +175,50 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 
+
+
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',  # فقط خطاها به فایل ذخیره می‌شوند
+            'class': 'logging.FileHandler',
+            'filename': 'error_log.txt',  # مسیر فایل لاگ
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],  # ارسال به فایل
+            'level': 'ERROR',  # سطح لاگ‌ها
+            'propagate': True,
+        },
+    },
+}
+
+
+
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  # مثلاً Redis DB شماره 1
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+
+
+
+
+CELERY_BEAT_SCHEDULE = {
+    'check-tickets-every-day': {
+        'task': 'tickets.tasks.check_and_update_ticket_status',
+        'schedule': 86400.0,
+    },
+}    
