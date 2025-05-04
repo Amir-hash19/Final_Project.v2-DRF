@@ -2,7 +2,7 @@ from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, D
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .OTPThrottle import OTPThrottle
 from .models import CustomUser
-from .serializers import CreateAccountSerializer, EditAccountSerializer, CustomAccountSerializer, ListSupportPanelSerializer
+from .serializers import CreateAccountSerializer, EditAccountSerializer, CustomAccountSerializer, ListSupportPanelSerializer, OTPSerializer
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -11,7 +11,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status
-
+from .OTPThrottle import OTPThrottle
+from .tasks import send_otp_task
 
 
 
@@ -92,3 +93,26 @@ class ListSupportAccountView(ListAPIView):
     search_fields = ["date_joined", "phone", "username", "last_name"]
     filterset_fields = ["date_joined", "birthday"]
     ordering_fields = ["-date_joined"]
+
+
+
+
+
+class SendOTPLogInView(APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [OTPThrottle]
+
+    def post(self, request):
+        serializer = OTPSerializer(data=request.data) 
+
+        if serializer.is_valid():
+            phone = str(serializer.validated_data["phone"]) 
+
+
+            send_otp_task.delay(phone)
+
+
+            return Response({"message": "OTP sent successfully"}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
