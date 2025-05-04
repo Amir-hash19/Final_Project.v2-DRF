@@ -41,3 +41,20 @@ class CreateAccountSerializer(serializers.ModelSerializer):
         return user
 
 
+
+
+class EditAccountSerializer(ModelSerializer):
+    groups = serializers.PrimaryKeyRelatedField(
+        queryset=Group.objects.all(), many=True, required=False, write_only=True
+    )
+
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "phone", "email",
+                  "about_me", "national_id", "gender", "password", "groups"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        user = self.context['request'].user
+        if not user.is_authenticated or not user.groups.filter(name__in=["superuser", "supportpanel"]).exists():
+            self.fields.pop('groups', None)

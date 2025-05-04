@@ -1,8 +1,8 @@
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .OTPThrottle import OTPThrottle
 from .models import CustomUser
-from .serializers import CreateAccountSerializer
+from .serializers import CreateAccountSerializer, EditAccountSerializer
 from rest_framework.views import APIView
 from .permissions import GroupPermission
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -11,7 +11,7 @@ from rest_framework import status
 
 
 
-
+#ساختن اکانت عادی برای کاربر نرمال 
 class CreateAccountUserView(CreateAPIView):
     permission_classes = [AllowAny]
 
@@ -32,5 +32,10 @@ class CreateAccountUserView(CreateAPIView):
 
 
 
-            
-       
+
+class EditAccountView(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = EditAccountSerializer
+
+    def get_object(self):
+        return self.request.user
