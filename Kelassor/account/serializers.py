@@ -13,7 +13,7 @@ class CreateAccountSerializer(serializers.ModelSerializer):
     
    
     class Meta:
-        model = CustomUser
+        model = User
         fields = [
             "username", "first_name", "last_name", "phone", "email",
             "about_me", "national_id", "gender","group","password"
@@ -76,3 +76,11 @@ class CustomAccountSerializer(ModelSerializer):
             if not user.is_authenticated or not user.groups.filter(name__in=["superuser", "supportpanel"]).exists():
                 self.fields.pop("groups")
 
+
+
+
+
+class ListSupportPanelSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"

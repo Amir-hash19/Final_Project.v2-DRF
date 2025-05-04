@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateAccountUserView, EditAccountView, LogOutView, DeleteAccountView, DetailAccountView
+from .views import CreateAccountUserView, EditAccountView, LogOutView, DeleteAccountView, DetailAccountView, ListSupportAccountView
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -8,6 +8,7 @@ urlpatterns = [
     path("refresh-token/", TokenRefreshView.as_view()), #موقت فقط برای توکن گرفتن 
     path("logout-account/", LogOutView.as_view(), name="logging-Out"),
     path("delete-account/", DeleteAccountView.as_view(), name="delete-account"),
-    path("detail-account/", DetailAccountView.as_view(), name="detail-account")
+    path("detail-account/", DetailAccountView.as_view(), name="detail-account"),
+    path("list-supportpanel-user/", ListSupportAccountView.as_view(), name="list-supportpanel-user")
 
 ]    
