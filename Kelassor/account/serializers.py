@@ -1,4 +1,5 @@
 from rest_framework.serializers import ModelSerializer
+from phonenumber_field.serializerfields import PhoneNumberField
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from rest_framework import serializers
@@ -84,3 +85,18 @@ class ListSupportPanelSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = "__all__"
+
+
+
+
+
+
+
+
+class OTPSerializer(serializers.Serializer):
+    phone = PhoneNumberField(region="IR")
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['phone'] = str(instance.phone)
+        return representation
+    
