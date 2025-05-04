@@ -31,6 +31,7 @@ class Blog(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
     blogcategory = models.ForeignKey(to=CategoryBlog, on_delete=models.CASCADE, null=True, blank=True)
     file = models.FileField(upload_to='articles/', null=True, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
 
 
     def __str__(self):
