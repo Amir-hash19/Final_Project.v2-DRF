@@ -100,3 +100,10 @@ class OTPSerializer(serializers.Serializer):
         representation['phone'] = str(instance.phone)
         return representation
     
+
+
+
+class VerifyOTPSerializer(serializers.Serializer):
+    phone = PhoneNumberField(region="IR")
+    otp = serializers.CharField(max_length=6)
+    
