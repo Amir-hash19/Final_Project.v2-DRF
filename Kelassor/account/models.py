@@ -18,7 +18,7 @@ class CustomUserManager(BaseUserManager):
 
         extra_fields.setdefault("username", None)
         extra_fields.setdefault("is_staff", False)
-        extra_fields.setdefault("is_superuser", False)
+        extra_fields.setdefault("is_active", True)
 
         user = self.model(phone=phone, **extra_fields)
         if password:

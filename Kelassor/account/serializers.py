@@ -27,8 +27,9 @@ class CreateAccountSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         group_name = validated_data.pop('group', None)
+        password = validated_data.pop("password", None)
 
-        user = CustomUser.objects.create(**validated_data)
+        user = CustomUser.objects.create_user(password=password, **validated_data)
 
         if group_name:
             try:
@@ -37,7 +38,6 @@ class CreateAccountSerializer(serializers.ModelSerializer):
             except Group.DoesNotExist:
                 raise serializers.ValidationError(f"Group '{group_name}' does not exist.")
 
-        user.save()
         return user
 
 
@@ -58,3 +58,21 @@ class EditAccountSerializer(ModelSerializer):
         user = self.context['request'].user
         if not user.is_authenticated or not user.groups.filter(name__in=["superuser", "supportpanel"]).exists():
             self.fields.pop('groups', None)
+
+
+
+
+class CustomAccountSerializer(ModelSerializer):
+    groups = serializers.StringRelatedField(many=True, read_only=True)
+  
+    class Meta:
+        model = User
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            user = self.context['request'].user
+
+            if not user.is_authenticated or not user.groups.filter(name__in=["superuser", "supportpanel"]).exists():
+                self.fields.pop("groups")
+
