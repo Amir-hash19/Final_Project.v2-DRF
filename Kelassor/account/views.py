@@ -2,18 +2,19 @@ from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, D
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .OTPThrottle import OTPThrottle
 from .models import CustomUser
-from .serializers import CreateAccountSerializer, EditAccountSerializer, CustomAccountSerializer, ListSupportPanelSerializer, OTPSerializer
+from .serializers import CreateAccountSerializer, EditAccountSerializer, CustomAccountSerializer, ListSupportPanelSerializer, OTPSerializer, VerifyOTPSerializer
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .permissions import GroupPermission
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.pagination import PageNumberPagination
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework import status
 from .OTPThrottle import OTPThrottle
 from .tasks import send_otp_task
-
+from django.core.cache import cache
 
 
 class CustomPagination(PageNumberPagination):
@@ -116,3 +117,51 @@ class SendOTPLogInView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+
+
+MAX_FAILED_ATTEMPTS = 5
+BLOCK_TIME_SECONDS = 300  
+
+class VerifyOTPView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = VerifyOTPSerializer(data=request.data)
+        if serializer.is_valid():
+            phone = str(serializer.validated_data["phone"])
+            otp = serializer.validated_data["otp"]
+
+            fail_key = f"otp_fail:{phone}"
+            blocked = cache.get(fail_key)
+
+            if blocked and int(blocked) >= MAX_FAILED_ATTEMPTS:
+                return Response({"error": "Too many attempts. Please try again later."},
+                                status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+            cached_otp = cache.get(f"otp:{phone}")
+            if cached_otp and str(cached_otp) == otp:
+                cache.delete(f"otp:{phone}")  
+                cache.delete(fail_key)  
+
+             
+                user = get_user_model().objects.filter(phone=phone).first()
+                if not user:
+                    return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                })
+
+            else:
+                # افزایش شمارنده تلاش ناموفق
+                current_fails = cache.get(fail_key, 0)
+                cache.set(fail_key, int(current_fails) + 1, timeout=BLOCK_TIME_SECONDS)
+
+                return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
