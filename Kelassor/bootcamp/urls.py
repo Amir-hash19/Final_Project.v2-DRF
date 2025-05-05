@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (AdminCreateBootcampView, AdminCreateCategoryView, AdminEditCategoryView,
-                     AdminDeleteCategoryView, AdminEditBootCampView, AdminDeleteBootCampView, ListAvailableBootCamp)
+                     AdminDeleteCategoryView, AdminEditBootCampView, AdminDeleteBootCampView, ListAvailableBootCamp, ListCategoryBootcampView)
 
 
 
@@ -14,5 +14,7 @@ urlpatterns = [
     path("edit-bootcamp/<slug:slug>/", AdminEditBootCampView.as_view(), name="edit-bootcamp-by-admin"),
     path("delete-bootcamp/<slug:slug>/", AdminDeleteBootCampView.as_view(), name="delete-bootcamp-by-admin"),
     path("list-bootcamps/", ListAvailableBootCamp.as_view(), name="list-registering-bootcamps"),
+    path("list-category-bootcamp/", ListCategoryBootcampView.as_view(), name="list-bootcamp-category"),
+    
 
 ]
