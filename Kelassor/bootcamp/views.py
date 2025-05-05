@@ -92,6 +92,17 @@ class ListCategoryBootcampView(ListAPIView):
 
 
 
+class AdminListAllBootCampView(ListAPIView):
+    queryset = Bootcamp.objects.all()
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    serializer_class = BootcampSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["title", "description"]
+    filterset_fields = ["status", "is_online", "category", "created_at"]
+    ordering_fields = ["-created_at"]
+
+
+
 
 
 
