@@ -20,7 +20,7 @@ class AdminCreateCategoryView(CreateAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = CategoryBootcampSerializer
     queryset = BootcampCategory.objects.all()
-    lookup_field = 'slug'
+    
 
 
 
@@ -28,4 +28,5 @@ class AdminEditCategoryView(UpdateAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = CategoryBootcampSerializer
     queryset = BootcampCategory.objects.all()
+    lookup_field = 'slug'
     

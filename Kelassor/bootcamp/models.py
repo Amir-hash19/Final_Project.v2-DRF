@@ -14,15 +14,23 @@ class BootcampCategory(models.Model):
     slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if  not self.slug or self._state.adding or self.name_has_changed():
             base_slug = slugify(self.name)
             unique_slug = base_slug
             counter = 1
-            while BootcampCategory.objects.filter(slug=unique_slug).exists():
+            while BootcampCategory.objects.filter(slug=unique_slug).exclude(id=self.id).exists():
                 unique_slug = f"{base_slug}-{counter}"
                 counter+=1
             self.slug = unique_slug
             super().save(*args, **kwargs)
+
+    def name_has_changed(self):
+        if not self.pk:
+            return True
+        old_name = BootcampCategory.objects.get(pk=self.pk).name
+        return old_name != self.name
+
+
 
 
 
