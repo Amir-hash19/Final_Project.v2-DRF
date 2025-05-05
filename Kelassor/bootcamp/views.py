@@ -66,10 +66,33 @@ class AdminDeleteBootCampView(DestroyAPIView):
 
 class ListAvailableBootCamp(ListAPIView):
     queryset = Bootcamp.objects.filter(status="registering")
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     serializer_class = BootcampSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["title", "category", "created_at"]
     filterset_fields = ["is_online", "price"]
     ordering_fields = ["-created_at"]
+
+
+
+
+
+class ListCategoryBootcampView(ListAPIView):
+    queryset = BootcampCategory.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = CategoryBootcampSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["name"]
+    filterset_fields = ["date_created"]
+    ordering_fields = ["-date_created"]
+
+
+
+
+
+
+
+
+
+
