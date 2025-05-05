@@ -1,4 +1,4 @@
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView
 from account.permissions import GroupPermission
 from account.views import CustomPagination
 from .models import BootcampCategory, Bootcamp, BootcampRegistration
@@ -20,5 +20,12 @@ class AdminCreateCategoryView(CreateAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = CategoryBootcampSerializer
     queryset = BootcampCategory.objects.all()
+    lookup_field = 'slug'
 
 
+
+class AdminEditCategoryView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    serializer_class = CategoryBootcampSerializer
+    queryset = BootcampCategory.objects.all()
+    
