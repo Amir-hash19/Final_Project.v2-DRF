@@ -10,6 +10,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 class BootcampCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True)
+    date_created = models.DateTimeField(auto_now_add=True)
 
 
     def __str__(self):

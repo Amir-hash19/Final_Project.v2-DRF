@@ -19,7 +19,7 @@ class CreateAccountSerializer(serializers.ModelSerializer):
             "username", "first_name", "last_name", "phone", "email",
             "about_me", "national_id", "gender","group","password"
         ]
-        read_only_fields = ['group']
+        read_only_fields = ['group', 'slug']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
