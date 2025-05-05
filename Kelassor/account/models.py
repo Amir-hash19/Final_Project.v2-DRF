@@ -2,6 +2,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Permis
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from django.utils.text import slugify
 from django.db import models
 import re
 
@@ -68,7 +69,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(max_length=128, null=True, blank=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=80)
-    email = models.EmailField(unique=True, null=True, blank=True)
+    email = models.EmailField(unique=True)
     phone = PhoneNumberField(unique=True, region='IR')
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -83,6 +84,21 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     )
 
     gender = models.CharField(max_length=6, choices=GENDER_TYPE, null=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.email)
+            unique_slug = base_slug
+            counter = 1
+            while CustomUser.objects.filter(slug=unique_slug).exists():
+                unique_slug = f"{base_slug}-{counter}"
+                counter+=1
+            self.slug = unique_slug
+        super().save(*args, **kwargs)        
+
+
+
 
     objects = CustomUserManager()
     USERNAME_FIELD = 'phone' 
