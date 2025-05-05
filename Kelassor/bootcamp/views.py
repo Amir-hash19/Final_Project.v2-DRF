@@ -4,7 +4,8 @@ from account.views import CustomPagination
 from .models import BootcampCategory, Bootcamp, BootcampRegistration
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from .serializers import BootcampSerializer, CategoryBootcampSerializer
-
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 
@@ -61,3 +62,14 @@ class AdminDeleteBootCampView(DestroyAPIView):
 
 
 
+
+
+class ListAvailableBootCamp(ListAPIView):
+    queryset = Bootcamp.objects.filter(status="registering")
+    permission_classes = [AllowAny]
+    serializer_class = BootcampSerializer
+    pagination_class = CustomPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["title", "category", "created_at"]
+    filterset_fields = ["is_online", "price"]
+    ordering_fields = ["-created_at"]

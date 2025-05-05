@@ -14,7 +14,7 @@ class BootcampSerializer(ModelSerializer):
     class Meta:
         model = Bootcamp
         fields = "__all__"
-        read_only_fields = ['slug']
+        read_only_fields = ['slug', 'status']
 
 
 
