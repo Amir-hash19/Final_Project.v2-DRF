@@ -46,9 +46,18 @@ class AdminDeleteCategoryView(DestroyAPIView):
 class AdminEditBootCampView(UpdateAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel","SuperUser")]
     serializer_class = BootcampSerializer
-    queryset = BootcampCategory.objects.all()
+    queryset = Bootcamp.objects.all()
     lookup_field = 'slug'
 
 
- 
-    
+
+
+
+class AdminDeleteBootCampView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel","SuperUser")]
+    serializer_class = BootcampSerializer
+    queryset = Bootcamp.objects.all()
+    lookup_field = 'slug'
+
+
+
