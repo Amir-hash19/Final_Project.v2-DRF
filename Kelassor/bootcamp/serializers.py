@@ -15,3 +15,14 @@ class BootcampSerializer(ModelSerializer):
         model = Bootcamp
         fields = "__all__"
         read_only_fields = ['slug']
+
+
+
+
+
+class CategoryBootcampSerializer(ModelSerializer):
+    class Meta:
+        model = BootcampCategory
+        fields = "__all__"
+        
+        
