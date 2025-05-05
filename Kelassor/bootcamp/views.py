@@ -43,3 +43,12 @@ class AdminDeleteCategoryView(DestroyAPIView):
 
 
 
+class AdminEditBootCampView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel","SuperUser")]
+    serializer_class = BootcampSerializer
+    queryset = BootcampCategory.objects.all()
+    lookup_field = 'slug'
+
+
+ 
+    
