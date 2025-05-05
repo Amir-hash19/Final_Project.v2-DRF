@@ -556,3 +556,265 @@ LINE 1: ...er"."national_id", "account_customuser"."gender", "account_c...
                                                              ^
 
 "GET /admin/account/customuser/ HTTP/1.1" 500 195822
+Internal Server Error: /admin/account/customuser/add/
+Traceback (most recent call last):
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 41, in _reraise_errors
+    yield
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 220, in dumps
+    payload = encoder(data)
+              ^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/utils/json.py", line 63, in dumps
+    return _dumps(s, cls=cls, **dict(default_kwargs, **kwargs))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/utils/json.py", line 47, in default
+    return super().default(o)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type PhoneNumber is not JSON serializable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/options.py", line 1984, in add_view
+    return self.changeform_view(request, None, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/options.py", line 1843, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/options.py", line 1894, in _changeform_view
+    self.save_model(request, new_object, form, not add)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/options.py", line 1314, in save_model
+    obj.save()
+  File "/home/amirykta/Documents/Final_Project2 DRF/Kelassor/account/models.py", line 98, in save
+    super().save(*args, **kwargs)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/auth/base_user.py", line 65, in save
+    super().save(*args, **kwargs)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/db/models/base.py", line 1023, in save_base
+    post_save.send(
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/Kelassor/account/signals.py", line 16, in send_welcome_message
+    send_welcome_sms_task.delay(last_name, user_phone_number)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/celery/app/task.py", line 444, in delay
+    return self.apply_async(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/celery/app/task.py", line 601, in apply_async
+    return app.send_task(
+           ^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/celery/app/base.py", line 922, in send_task
+    amqp.send_task_message(P, name, message, **options)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/celery/app/amqp.py", line 523, in send_task_message
+    ret = producer.publish(
+          ^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/messaging.py", line 178, in publish
+    body, content_type, content_encoding = self._prepare(
+                                           ^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/messaging.py", line 280, in _prepare
+    body) = dumps(body, serializer=serializer)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 219, in dumps
+    with _reraise_errors(EncodeError):
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 45, in _reraise_errors
+    reraise(wrapper, wrapper(exc), sys.exc_info()[2])
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/exceptions.py", line 34, in reraise
+    raise value.with_traceback(tb)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 41, in _reraise_errors
+    yield
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 220, in dumps
+    payload = encoder(data)
+              ^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/utils/json.py", line 63, in dumps
+    return _dumps(s, cls=cls, **dict(default_kwargs, **kwargs))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/utils/json.py", line 47, in default
+    return super().default(o)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+kombu.exceptions.EncodeError: Object of type PhoneNumber is not JSON serializable
+"POST /admin/account/customuser/add/ HTTP/1.1" 500 321768
+Internal Server Error: /admin/account/customuser/add/
+Traceback (most recent call last):
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 41, in _reraise_errors
+    yield
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 220, in dumps
+    payload = encoder(data)
+              ^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/utils/json.py", line 63, in dumps
+    return _dumps(s, cls=cls, **dict(default_kwargs, **kwargs))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/utils/json.py", line 47, in default
+    return super().default(o)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type PhoneNumber is not JSON serializable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/options.py", line 1984, in add_view
+    return self.changeform_view(request, None, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/utils/decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/utils/decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/options.py", line 1843, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/options.py", line 1894, in _changeform_view
+    self.save_model(request, new_object, form, not add)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/admin/options.py", line 1314, in save_model
+    obj.save()
+  File "/home/amirykta/Documents/Final_Project2 DRF/Kelassor/account/models.py", line 98, in save
+    super().save(*args, **kwargs)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/contrib/auth/base_user.py", line 65, in save
+    super().save(*args, **kwargs)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/db/models/base.py", line 1023, in save_base
+    post_save.send(
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/Kelassor/account/signals.py", line 16, in send_welcome_message
+    send_welcome_sms_task.delay(last_name, user_phone_number)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/celery/app/task.py", line 444, in delay
+    return self.apply_async(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/celery/app/task.py", line 601, in apply_async
+    return app.send_task(
+           ^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/celery/app/base.py", line 922, in send_task
+    amqp.send_task_message(P, name, message, **options)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/celery/app/amqp.py", line 523, in send_task_message
+    ret = producer.publish(
+          ^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/messaging.py", line 178, in publish
+    body, content_type, content_encoding = self._prepare(
+                                           ^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/messaging.py", line 280, in _prepare
+    body) = dumps(body, serializer=serializer)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 219, in dumps
+    with _reraise_errors(EncodeError):
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 45, in _reraise_errors
+    reraise(wrapper, wrapper(exc), sys.exc_info()[2])
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/exceptions.py", line 34, in reraise
+    raise value.with_traceback(tb)
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 41, in _reraise_errors
+    yield
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/serialization.py", line 220, in dumps
+    payload = encoder(data)
+              ^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/utils/json.py", line 63, in dumps
+    return _dumps(s, cls=cls, **dict(default_kwargs, **kwargs))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/amirykta/Documents/Final_Project2 DRF/env/lib/python3.12/site-packages/kombu/utils/json.py", line 47, in default
+    return super().default(o)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+kombu.exceptions.EncodeError: Object of type PhoneNumber is not JSON serializable
+"POST /admin/account/customuser/add/ HTTP/1.1" 500 321768
