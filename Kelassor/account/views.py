@@ -50,8 +50,6 @@ class RegisterAccountView(APIView):
 
 
 
-
-
 #ویرایش اکانت برای کاربر عادی
 class EditAccountView(UpdateAPIView):
     permission_classes = [IsAuthenticated]
@@ -67,9 +65,16 @@ class LogOutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # request.user.auth_token.delete()
-        return Response({"details":"User Logged Out Successfully!"})
-    
+        try:
+            refresh_token = request.data.get('refresh_token')
+            if refresh_token:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            return Response({"details":"User Logged Out Successfully!"})
+        except Exception as e:
+            return Response({"details": "Error during logout, please try again later."}, status=500)
+
+        
 
 
 
