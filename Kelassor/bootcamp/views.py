@@ -1,4 +1,4 @@
-from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView
 from account.permissions import GroupPermission
 from account.views import CustomPagination
 from .models import BootcampCategory, Bootcamp, BootcampRegistration
@@ -104,6 +104,13 @@ class AdminListAllBootCampView(ListAPIView):
 
 
 
+
+
+class DetailBootCampView(RetrieveAPIView):
+    permission_classes = [AllowAny]
+    queryset = Bootcamp.objects.all()
+    serializer_class = BootcampSerializer
+    lookup_field = "slug"
 
 
 
