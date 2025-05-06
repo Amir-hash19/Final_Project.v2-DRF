@@ -10,7 +10,6 @@ urlpatterns = [
     path("add-category/", AdminCreateCategoryView.as_view(), name="create-category-by-admin"),
     path("edit-category/<slug:slug>/", AdminEditCategoryView.as_view(), name="edit-bootcamp-by-admin"),
     path("delete-bootcamp-category/<slug:slug>/", AdminDeleteCategoryView.as_view(), name="delete-bootcamp-category-by-superuser"),
-    #از این به پایین تست نشده در پستمن
     path("edit-bootcamp/<slug:slug>/", AdminEditBootCampView.as_view(), name="edit-bootcamp-by-admin"),
     path("delete-bootcamp/<slug:slug>/", AdminDeleteBootCampView.as_view(), name="delete-bootcamp-by-admin"),
     path("list-bootcamps/", ListAvailableBootCamp.as_view(), name="list-registering-bootcamps"),
