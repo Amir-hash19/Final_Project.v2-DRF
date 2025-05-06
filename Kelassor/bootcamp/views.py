@@ -3,11 +3,12 @@ from account.permissions import GroupPermission
 from account.views import CustomPagination
 from .models import BootcampCategory, Bootcamp, BootcampRegistration
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-from .serializers import BootcampSerializer, CategoryBootcampSerializer
+from .serializers import BootcampSerializer, CategoryBootcampSerializer, BootcampCountSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-
-
+from rest_framework.exceptions import NotFound
+from django.db.models import Count
+from django.http import Http404
 
 class AdminCreateBootcampView(CreateAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
@@ -107,14 +108,34 @@ class AdminListAllBootCampView(ListAPIView):
 class DetailBootCampView(RetrieveAPIView):
     permission_classes = [AllowAny]
     serializer_class = BootcampSerializer
-    queryset = Bootcamp.objects.filter(status="registering")
     lookup_field = "slug"
 
-class DetailBootCampView(RetrieveAPIView):
+    def get_queryset(self):
+        return Bootcamp.objects.filter(status="registering")
+     
+    def get_object(self):
+        try:
+            return super().get_object()    
+        except Http404:
+            raise NotFound("Bootcamp nor found !")
+
+
+
+
+
+
+class MostRequestedBootCampView(ListAPIView):
+    serializer_class = BootcampCountSerializer
     permission_classes = [AllowAny]
-    queryset = Bootcamp.objects.all()
-    serializer_class = BootcampSerializer
-    lookup_field = "slug"
+
+    def get_queryset(self):
+        return 
+    Bootcamp.objects.annotate(
+        request_count=Count("registrations")
+    ).order_by("-request_count")[:10]
+
+
+
 
 
 

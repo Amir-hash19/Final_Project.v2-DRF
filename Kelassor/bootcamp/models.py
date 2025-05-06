@@ -84,7 +84,7 @@ class Bootcamp(models.Model):
 
 class BootcampRegistration(models.Model):
     volunteer = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE)
-    bootcamp = models.ForeignKey(to=Bootcamp, on_delete=models.CASCADE, name="bootcamp")
+    bootcamp = models.ForeignKey(to=Bootcamp, on_delete=models.CASCADE, related_name="registrations")
 
     PAYMENT_STATUS_CHOICES = (
         ("installment_pay", "Installment_Pay"),

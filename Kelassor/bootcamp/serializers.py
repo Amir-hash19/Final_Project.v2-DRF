@@ -28,4 +28,12 @@ class CategoryBootcampSerializer(ModelSerializer):
         read_only_fields = ['slug']
 
 
-        
+
+
+
+class BootcampCountSerializer(serializers.ModelSerializer):
+    request_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Bootcamp
+        fields = ['title', 'is_online', 'request_count'] 
