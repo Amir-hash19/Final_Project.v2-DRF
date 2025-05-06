@@ -104,7 +104,11 @@ class AdminListAllBootCampView(ListAPIView):
 
 
 
-
+class DetailBootCampView(RetrieveAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = BootcampSerializer
+    queryset = Bootcamp.objects.filter(status="registering")
+    lookup_field = "slug"
 
 class DetailBootCampView(RetrieveAPIView):
     permission_classes = [AllowAny]

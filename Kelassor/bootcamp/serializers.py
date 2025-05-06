@@ -13,7 +13,8 @@ class BootcampSerializer(ModelSerializer):
         many=True)
     class Meta:
         model = Bootcamp
-        fields = "__all__"
+        fields = ["instructor", "title", "instructor", "price", "capacity", "category", 
+                "description", "start_date", "end_date", "created_at", "hours", "days", "slug"]
         read_only_fields = ['slug', 'status']
 
 
