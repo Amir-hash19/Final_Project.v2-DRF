@@ -14,39 +14,40 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 from rest_framework import status
 from django.db import transaction
 from .OTPThrottle import OTPThrottle
 from .tasks import send_otp_task
 from django.core.cache import cache
-
+import json
 
 class CustomPagination(PageNumberPagination):
     page_size = 20
 
 
+
 #ساختن اکانت عادی برای کاربر نرمال 
-class CreateAccountUserView(CreateAPIView):
+
+class RegisterAccountView(APIView):
     permission_classes = [AllowAny]
-
     def post(self, request):
-        serializer = CreateAccountSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                with transaction.atomic():
-                    user = serializer.save()
+        with transaction.atomic():
+            serializer = CreateAccountSerializer(data=request.data)
+            if serializer.is_valid():
+                user = serializer.save()
 
-                    refresh = RefreshToken.for_user(user)
-
+                refresh = RefreshToken.for_user(user)
+          
                 return Response({
-                    "user":serializer.data,
-                    "refresh":str(refresh),
-                    "access":str(refresh.access_token)
-                },status=status.HTTP_201_CREATED)
-            except Exception as e:
-                return Response({"detail": f"Something went wrong: {str(e)}"},
-                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    "user": serializer.data,
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token)
+                    },status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
 

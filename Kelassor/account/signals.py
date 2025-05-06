@@ -10,7 +10,7 @@ from .tasks import send_welcome_sms_task
 def send_welcome_message(sender, created, instance, **kwargs):
     if created:
         last_name = instance.last_name
-        user_phone_number = instance.phone
+        user_phone_number = str(instance.phone)
 
         
         send_welcome_sms_task.delay(last_name, user_phone_number)

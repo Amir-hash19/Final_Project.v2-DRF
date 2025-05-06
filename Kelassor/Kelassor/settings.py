@@ -179,28 +179,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'ERROR',  # فقط خطاها به فایل ذخیره می‌شوند
-            'class': 'logging.FileHandler',
-            'filename': 'error_log.txt',  # مسیر فایل لاگ
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],  # ارسال به فایل
-            'level': 'ERROR',  # سطح لاگ‌ها
-            'propagate': True,
-        },
-    },
-}
-
-
-
-
 
 CACHES = {
     "default": {
