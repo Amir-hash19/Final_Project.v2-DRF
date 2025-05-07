@@ -4,7 +4,8 @@ from account.permissions import GroupPermission
 from account.views import CustomPagination
 from .models import BootcampCategory, Bootcamp, BootcampRegistration
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-from .serializers import BootcampSerializer, CategoryBootcampSerializer, BootcampCountSerializer, BootCampRegistrationSerializer
+from .serializers import (BootcampSerializer,CategoryBootcampSerializer, BootcampCountSerializer, BootCampRegistrationSerializer,
+                                               BootCampRegitrationSerializer)
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import NotFound
@@ -144,5 +145,13 @@ class BootcampRegistrationViewSet(viewsets.ModelViewSet):
     queryset = BootcampRegistration.objects.all()
     serializer_class = BootCampRegistrationSerializer
     permission_classes = [IsAuthenticated]
+
     def perform_create(self, serializer):
         serializer.save(volunteer=self.request.user)
+
+
+
+class ListBootCampRegistrationView(ListAPIView):
+    queryset = BootcampRegistration.objects.filter(status='pending')
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    serializer_class = BootCampRegitrationSerializer
