@@ -62,4 +62,8 @@ class BootCampRegistrationSerializer(serializers.HyperlinkedModelSerializer):
         
        
         
-  
+class BootCampRegitrationSerializer(ModelSerializer):
+    class Meta:
+        model = BootcampRegistration
+        fields = "__all__"
+        read_only_fields = ["reviewed_by", "volunteer"] 
