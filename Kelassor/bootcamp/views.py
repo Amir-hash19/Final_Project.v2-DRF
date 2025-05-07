@@ -1,9 +1,10 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView
+from rest_framework import viewsets
 from account.permissions import GroupPermission
 from account.views import CustomPagination
 from .models import BootcampCategory, Bootcamp, BootcampRegistration
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-from .serializers import BootcampSerializer, CategoryBootcampSerializer, BootcampCountSerializer
+from .serializers import BootcampSerializer, CategoryBootcampSerializer, BootcampCountSerializer, BootCampRegistrationSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import NotFound
@@ -139,3 +140,9 @@ class MostRequestedBootCampView(ListAPIView):
 
 
 
+class BootcampRegistrationViewSet(viewsets.ModelViewSet):
+    queryset = BootcampRegistration.objects.all()
+    serializer_class = BootCampRegistrationSerializer
+    permission_classes = [IsAuthenticated]
+    def perform_create(self, serializer):
+        serializer.save(volunteer=self.request.user)
