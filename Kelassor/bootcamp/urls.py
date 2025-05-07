@@ -1,9 +1,12 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
+from django.urls import path, include
 from .views import (AdminCreateBootcampView, AdminCreateCategoryView, AdminEditCategoryView,
                      AdminDeleteCategoryView, AdminEditBootCampView, AdminDeleteBootCampView, 
-                     ListAvailableBootCamp, ListCategoryBootcampView, AdminListAllBootCampView, DetailBootCampView, MostRequestedBootCampView)
+                     ListAvailableBootCamp, ListCategoryBootcampView, AdminListAllBootCampView,
+                       DetailBootCampView, MostRequestedBootCampView, BootcampRegistrationViewSet)
 
-
+router = DefaultRouter()
+router.register(r'registrations', BootcampRegistrationViewSet)
 
 
 urlpatterns = [
@@ -17,6 +20,7 @@ urlpatterns = [
     path("list-category-bootcamp/", ListCategoryBootcampView.as_view(), name="list-bootcamp-category"),
     path("list-all-bootcamps/", AdminListAllBootCampView.as_view(), name="list-all-bootcamps-for-admin"),
     path("detail-bootcamp/<slug:slug>/", DetailBootCampView.as_view(), name="detail-bootcamp"),
-    path("most-registered-bootcamp", MostRequestedBootCampView.as_view(), name="list-most-registred-bootcamp")
+    path("most-registered-bootcamp", MostRequestedBootCampView.as_view(), name="list-most-registred-bootcamp"),
+    path("", include(router.urls)),
 
 ]

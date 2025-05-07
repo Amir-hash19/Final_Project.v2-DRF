@@ -37,3 +37,29 @@ class BootcampCountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bootcamp
         fields = ['title', 'is_online', 'request_count'] 
+
+
+
+
+
+class BootCampRegistrationSerializer(serializers.HyperlinkedModelSerializer):
+    bootcamp = serializers.HyperlinkedRelatedField(
+        view_name = 'bootcamp-detail',
+        queryset = Bootcamp.objects.filter(status='registering')
+    )
+    class Meta:
+        model = BootcampRegistration
+        fields = [
+            'url',
+            'id',
+            'bootcamp',
+            'payment_type',
+            'installment_count',
+            'registered_at',
+            'status',
+            'comment',
+            'phone_number',]
+        
+       
+        
+  
