@@ -12,7 +12,7 @@ User = get_user_model()
 
 
 class CreateAccountSerializer(serializers.ModelSerializer):
-    group = serializers.CharField(write_only=True, required=False)
+    group = serializers.CharField(read_only=True, required=False)
    
 
     class Meta:
@@ -22,6 +22,7 @@ class CreateAccountSerializer(serializers.ModelSerializer):
             "about_me", "national_id", "gender","group",
         ]
         read_only_fields = ['group']
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data["phone"] = str(instance.phone) 
