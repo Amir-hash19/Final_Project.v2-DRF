@@ -1,11 +1,15 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView
-from rest_framework import viewsets
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
 from account.permissions import GroupPermission
 from account.views import CustomPagination
+from rest_framework import viewsets
 from .models import BootcampCategory, Bootcamp, BootcampRegistration, SMSLog
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from .serializers import (BootcampSerializer,CategoryBootcampSerializer, BootcampCountSerializer,BootcampCategorySerializer,BootcampRegistrationCreateSerializer,
-                                        AdminBootcampRegistrationSerializer, BootCampRegitrationSerializer, BootcampStudentSerializer, SMSLogSerializer)
+                                        AdminBootcampRegistrationSerializer, BootCampRegitrationSerializer, BootcampStudentSerializer,
+                                        SMSLogSerializer, MassNotificationSerializer)
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
@@ -197,7 +201,7 @@ class CreateBootcampRegistrationView(CreateAPIView):
 
 
 
-class BootcampApprovedStudentsListView(ListAPIView):
+class BootcampApprovedStudentsListView(ListAPIView):#لیست اعضای یه بوت کمپ
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = BootcampStudentSerializer
 
@@ -226,3 +230,20 @@ class DeleteSMSLogView(DestroyAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser", "SupportPanel")]
     queryset = SMSLog.objects.all()
     serializer_class = SMSLogSerializer
+
+
+
+
+class MassNotificationView(APIView):
+    permission_classes = [IsAuthenticated, GroupPermission("SuperUser", "SupportPanel")]
+
+
+
+    def post(self, request):
+        serializer = MassNotificationSerializer(data=request.data)
+        if serializer.is_valid():
+            notifications = serializer.save()
+            return Response({
+                "detail": f"{len(notifications)} notifications created and are being sent."
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

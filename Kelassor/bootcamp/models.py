@@ -139,4 +139,18 @@ class SMSLog(models.Model):
 
     def __str__(self):
         return f"SMS to {self.phone_number} - {self.status}"
-    
+
+
+
+
+
+class ClassNotifications(models.Model):
+    title = models.CharField(max_length=100)
+    bootcampRegistration = models.ForeignKey(to=BootcampRegistration, on_delete=models.PROTECT)
+    admin_message = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=50, choices=[('pending', 'Pending'), ('sent', 'Sent')], default='pending')
+
+
+    def __str__(self):
+        return self.title

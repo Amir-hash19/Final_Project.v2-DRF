@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Bootcamp, BootcampCategory, BootcampRegistration, SMSLog
+from .models import Bootcamp, BootcampCategory, BootcampRegistration, SMSLog, ClassNotifications
 from rest_framework import serializers
 from account.models import CustomUser
 
@@ -157,6 +157,10 @@ class AdminBootcampRegistrationSerializer(serializers.ModelSerializer):
 
 
 
+
+
+
+
 class BootcampStudentSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
 
@@ -171,8 +175,52 @@ class BootcampStudentSerializer(serializers.ModelSerializer):
 
 
 
+
+
+
+class MassNotificationSerializer(serializers.Serializer):
+    bootcamp_title = serializers.CharField()
+    title = serializers.CharField(max_length=100)
+    admin_message = serializers.CharField()
+
+    def validate(self, data):
+        try:
+            bootcamp = Bootcamp.objects.get(title=data['bootcamp_title'])
+        except Bootcamp.DoesNotExist:
+            raise serializers.ValidationError({'bootcamp_title': 'Bootcamp not found.'})
+        data['bootcamp'] = bootcamp
+        return data
+    
+    def create(self, validated_data):
+        bootcamp = validated_data['bootcamp']
+        title = validated_data['title']
+        admin_message = validated_data['admin_message']
+
+        registrations = BootcampRegistration.objects.filter(bootcamp=bootcamp)
+
+        notifications = []
+        from .tasks import send_sms_notification
+
+        for reg in registrations:
+            notif = ClassNotifications.objects.create(
+                title=title,
+                bootcampRegistration=reg,
+                admin_message=admin_message,
+                status='pending'
+            )
+            notifications.append(notif)
+            send_sms_notification.delay(notif.id)
+
+        return notifications    
+
+
+
+
+
+
+
+
 class SMSLogSerializer(ModelSerializer):
     class Meta:
         model = SMSLog
         fields = "__all__"
-        
