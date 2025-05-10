@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Bootcamp, BootcampCategory, BootcampRegistration
+from .models import Bootcamp, BootcampCategory, BootcampRegistration, SMSLog
 from rest_framework import serializers
 from account.models import CustomUser
 
@@ -166,3 +166,13 @@ class BootcampStudentSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         return obj.volunteer.get_full_name()
+    
+
+
+
+
+class SMSLogSerializer(ModelSerializer):
+    class Meta:
+        model = SMSLog
+        fields = "__all__"
+        

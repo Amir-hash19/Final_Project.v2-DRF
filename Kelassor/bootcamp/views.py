@@ -2,10 +2,10 @@ from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, D
 from rest_framework import viewsets
 from account.permissions import GroupPermission
 from account.views import CustomPagination
-from .models import BootcampCategory, Bootcamp, BootcampRegistration
+from .models import BootcampCategory, Bootcamp, BootcampRegistration, SMSLog
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from .serializers import (BootcampSerializer,CategoryBootcampSerializer, BootcampCountSerializer,BootcampCategorySerializer,BootcampRegistrationCreateSerializer,
-                                        AdminBootcampRegistrationSerializer, BootCampRegitrationSerializer, BootcampStudentSerializer)
+                                        AdminBootcampRegistrationSerializer, BootCampRegitrationSerializer, BootcampStudentSerializer, SMSLogSerializer)
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
@@ -213,3 +213,9 @@ class BootcampApprovedStudentsListView(ListAPIView):
 
 
 
+
+
+class ListSMSLogView(ListAPIView):
+    queryset = SMSLog.objects.all()
+    permission_classes = [IsAuthenticated, GroupPermission("SuperUser", "SupportPanel")]
+    serializer_class = SMSLogSerializer
