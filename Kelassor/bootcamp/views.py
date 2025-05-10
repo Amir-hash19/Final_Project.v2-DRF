@@ -5,7 +5,7 @@ from account.views import CustomPagination
 from .models import BootcampCategory, Bootcamp, BootcampRegistration
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from .serializers import (BootcampSerializer,CategoryBootcampSerializer, BootcampCountSerializer,BootcampCategorySerializer,BootcampRegistrationCreateSerializer,
-                                        AdminBootcampRegistrationSerializer, BootCampRegitrationSerializer)
+                                        AdminBootcampRegistrationSerializer, BootCampRegitrationSerializer, BootcampStudentSerializer)
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
@@ -192,4 +192,24 @@ class CreateBootcampRegistrationView(CreateAPIView):
         serializer.save(
             volunteer=self.request.user
         )
+
+
+
+
+
+class BootcampApprovedStudentsListView(ListAPIView):
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    serializer_class = BootcampStudentSerializer
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        try:
+            bootcamp = Bootcamp.objects.get(slug=slug)
+        except Bootcamp.DoesNotExist:
+            raise NotFound("BootCamp does Not existed!") 
         
+        return BootcampRegistration.objects.filter(bootcamp=bootcamp, status='approved')   
+
+
+
+
