@@ -4,15 +4,15 @@ from account.permissions import GroupPermission
 from account.views import CustomPagination
 from .models import BootcampCategory, Bootcamp, BootcampRegistration
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-from .serializers import (BootcampSerializer,CategoryBootcampSerializer, BootcampCountSerializer,BootcampCategorySerializer,BootcampRegistrationSerializer,
-                                        BootCampRegistraionSerializer, BootCampRegitrationSerializer)
+from .serializers import (BootcampSerializer,CategoryBootcampSerializer, BootcampCountSerializer,BootcampCategorySerializer,BootcampRegistrationCreateSerializer,
+                                        AdminBootcampRegistrationSerializer, BootCampRegitrationSerializer)
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
 from rest_framework.exceptions import NotFound
 from django.db.models import Count
+from django.utils import timezone
 from django.http import Http404
-
 
 
 
@@ -158,40 +158,12 @@ class ListBootCampRegistrationView(ListAPIView):
     queryset = BootcampRegistration.objects.filter(status='pending')
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = BootCampRegitrationSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["phone_number", "comment"]
+    filterset_fields = ["payment_type", "status", "reviewed_by"]
+    ordering_fields = ["-registered_at"]
+    
 
-
-
-
-
-
-class CreateBootcampRegistrationView(CreateAPIView):
-    serializer_class = BootcampRegistrationSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return BootcampRegistration.objects.filter(volunteer=self.request.user)
-
-
-    def perform_create(self, serializer):
-        user = self.request.user
-        bootcamp = serializer.validated_data['bootcamp']
-
-
-        if bootcamp.status != 'registering':
-            raise ValidationError("this bootcamp is not available!")
-
-
-        previous = BootcampRegistration.objects.filter(
-            volunteer = user,
-            status = "approved"
-        ).order_by("-registered_at").filter()
-
-        if previous:
-            serializer.validated_data["phone_number"] = previous.phone_number
-            serializer.validated_data["payment_type"] = previous.payment_type
-            serializer.validated_data['slug'] = f"{bootcamp.slug}-{user.id}"
-            
-        serializer.save(volunteer=user)    
 
 
 
@@ -200,9 +172,24 @@ class CreateBootcampRegistrationView(CreateAPIView):
 class CheckRegistraionStatusView(UpdateAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     queryset = BootcampRegistration.objects.all()
-    serializer_class = BootCampRegistraionSerializer
+    serializer_class = AdminBootcampRegistrationSerializer
+    lookup_field = 'slug'
 
     def perform_update(self, serializer):
-        reviewed_by = self.request.user
+        serializer.save(
+            reviewed_by=self.request.user, reviewed_at=timezone.now()
+        )
+        
 
+
+
+class CreateBootcampRegistrationView(CreateAPIView):
+    queryset = BootcampRegistration.objects.all()
+    serializer_class = BootcampRegistrationCreateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(
+            volunteer=self.request.user
+        )
         
