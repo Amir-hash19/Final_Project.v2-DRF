@@ -4,7 +4,7 @@ from .views import (AdminCreateBootcampView, AdminCreateCategoryView, AdminEditC
                     AdminDeleteCategoryView, AdminEditBootCampView, AdminDeleteBootCampView, 
                     ListAvailableBootCampViewSet, ListCategoryBootcampView, AdminListAllBootCampView,
                     DetailBootCampView, MostRequestedBootCampView, ListBootCampRegistrationView, 
-                    BootcampCategoryViewSet, CreateBootcampRegistrationView, CheckRegistraionStatusView, BootcampApprovedStudentsListView)
+                    BootcampCategoryViewSet, CreateBootcampRegistrationView, CheckRegistraionStatusView, BootcampApprovedStudentsListView, ListSMSLogView)
 
 router = DefaultRouter()
 router.register(r'bootcamps', ListAvailableBootCampViewSet, basename='bootcamp')
@@ -26,6 +26,7 @@ urlpatterns = [
     path("list-bootcamp-registration/", ListBootCampRegistrationView.as_view(), name="list-boortcamp-regitration"),
     path("check-registration-status/<slug:slug>/", CheckRegistraionStatusView.as_view(), name="check-status-registrations"),
     path("bootcamps/approved-students/<slug:slug>/", BootcampApprovedStudentsListView.as_view(), name="students-bootcamp"),
+    path("list-SMSLog/", ListSMSLogView.as_view(), name="SMS-log-for-admin"),
     path('', include(router.urls)), 
      
 
