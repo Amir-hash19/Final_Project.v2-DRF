@@ -69,10 +69,28 @@ class BootCampRegistrationSerializer(serializers.HyperlinkedModelSerializer):
        
         
 class BootCampRegitrationSerializer(ModelSerializer):
+    volunteer_name = serializers.SerializerMethodField()
+    bootcamp_name = serializers.SerializerMethodField()
+
     class Meta:
         model = BootcampRegistration
         fields = "__all__"
-        read_only_fields = ["reviewed_by", "volunteer"] 
+        read_only_fields = ["reviewed_by", "volunteer", "reviewed_at", "status", "slug"] 
+
+    def get_volunteer_name(self, obj):
+        return obj.volunteer.get_full_name()
+
+    def get_bootcamp_name(self, obj):
+        return obj.bootcamp.title
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['volunteer'] = instance.volunteer.get_full_name()
+        representation['bootcamp'] = instance.bootcamp.title
+        return representation
+
+
+
 
 
 
@@ -88,49 +106,51 @@ class BootcampCategorySerializer(serializers.HyperlinkedModelSerializer):
 
 
 
-class BootcampRegistrationSerializer(serializers.ModelSerializer):
+class BootcampRegistrationCreateSerializer(serializers.ModelSerializer):
+    volunteer = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = BootcampRegistration
-        fields = '__all__'
-        read_only_fields = ['volunteer', 'status', 'registered_at', 'reviewed_at', 'reviewed_by', 'admin_status_comment', 'slug']
+        fields = [
+            'volunteer', 'bootcamp', 'payment_type', 'installment_count',
+            'comment', 'phone_number', 'slug'
+        ]
+
     def create(self, validated_data):
-        request = self.context.get('request')
-        user = request.user
+        volunteer = validated_data['volunteer']
+        bootcamp = validated_data['bootcamp']
 
-                    
-        previous = BootcampRegistration.objects.filter(
-            volunteer=user,
+        
+        existing_registration = BootcampRegistration.objects.filter(
+            volunteer=volunteer,
             status='approved'
-        ).order_by('-registered_at').first()
+        ).exclude(bootcamp=bootcamp).first()
 
-        if previous:
-        # انتقال همه‌ی اطلاعات قابل کپی
-            validated_data['phone_number'] = previous.phone_number
-            validated_data['payment_type'] = previous.payment_type
-            validated_data['installment_count'] = previous.installment_count
-            validated_data['slug'] = f"{validated_data['bootcamp'].slug}-{user.id}"
-
-        validated_data['volunteer'] = user
+        if existing_registration:
+            
+            for field, value in validated_data.items():
+                setattr(existing_registration, field, value)
+            existing_registration.save()
+            return existing_registration
         return super().create(validated_data)
-
   
 
 
 
-class BootCampRegistraionSerializer(ModelSerializer):
+
+
+class AdminBootcampRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = BootcampRegistration
-        fields = "__all__"
-        read_only_fields = ["volunteer", "reviewed_by", "reviewed_at", "phone_number", "comment", "bootcamp", "payment_type", "slug"]
+        fields = ["status", "admin_status_comment"]
 
-    def update(self, instance, validated_data):
-        status = validated_data.get('status', instance.status)
-        if status:
-            instance.status = status
+    def to_internal_value(self, data):
+        allowed_keys = {'status', 'admin_status_comment'}
+        extra_keys = set(data.keys()) - allowed_keys
 
-        comment = validated_data.get('admin_status_comment', instance.admin_status_comment)    
-        if comment:
-            instance.admin_status_comment = comment
-
-        instance.save()
-        return instance    
+        if extra_keys:
+            raise serializers.ValidationError(
+                f"You are only allowed to update: {', '.join(allowed_keys)}. Extra fields: {', '.join(extra_keys)}"
+            )
+        return super().to_internal_value(data)
+            
+ 

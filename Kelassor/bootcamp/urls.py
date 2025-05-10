@@ -1,9 +1,10 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from .views import (AdminCreateBootcampView, AdminCreateCategoryView, AdminEditCategoryView,
-                     AdminDeleteCategoryView, AdminEditBootCampView, AdminDeleteBootCampView, 
-                     ListAvailableBootCampViewSet, ListCategoryBootcampView, AdminListAllBootCampView,
-                       DetailBootCampView, MostRequestedBootCampView, ListBootCampRegistrationView, BootcampCategoryViewSet, CreateBootcampRegistrationView, CheckRegistraionStatusView)
+                    AdminDeleteCategoryView, AdminEditBootCampView, AdminDeleteBootCampView, 
+                    ListAvailableBootCampViewSet, ListCategoryBootcampView, AdminListAllBootCampView,
+                    DetailBootCampView, MostRequestedBootCampView, ListBootCampRegistrationView, 
+                    BootcampCategoryViewSet, CreateBootcampRegistrationView, CheckRegistraionStatusView)
 
 router = DefaultRouter()
 router.register(r'bootcamps', ListAvailableBootCampViewSet, basename='bootcamp')
@@ -21,11 +22,10 @@ urlpatterns = [
     path("list-all-bootcamps/", AdminListAllBootCampView.as_view(), name="list-all-bootcamps-for-admin"),
     path("detail-bootcamp/<slug:slug>/", DetailBootCampView.as_view(), name="detail-bootcamp"),
     path("most-registered-bootcamp", MostRequestedBootCampView.as_view(), name="list-most-registred-bootcamp"),
-    path("list-bootcamp-registration/", ListBootCampRegistrationView.as_view(), name="list-boortcamp-regitration"),
     path("bootcamp-signup/", CreateBootcampRegistrationView.as_view(), name="registration-bootcamp"),
-    path("check-registraion-status/<slug:slug>/", CheckRegistraionStatusView.as_view(), name="check-status-registrations"),
+    path("list-bootcamp-registration/", ListBootCampRegistrationView.as_view(), name="list-boortcamp-regitration"),
+    path("check-registration-status/<slug:slug>/", CheckRegistraionStatusView.as_view(), name="check-status-registrations"),
     path('', include(router.urls)), 
-    
-
+     
 
 ]
