@@ -153,4 +153,16 @@ class AdminBootcampRegistrationSerializer(serializers.ModelSerializer):
             )
         return super().to_internal_value(data)
             
- 
+
+
+
+
+class BootcampStudentSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BootcampRegistration
+        fields = ['full_name', 'phone_number', 'status', 'registered_at', 'payment_type']
+
+    def get_full_name(self, obj):
+        return obj.volunteer.get_full_name()
