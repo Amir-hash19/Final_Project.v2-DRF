@@ -1,6 +1,6 @@
 from django.db import models
 from account.models import CustomUser
-from bootcamp.models import Bootcamp
+from bootcamp.models import Bootcamp, BootcampRegistration
 
 
 
@@ -38,3 +38,9 @@ class TicketMessage(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+
+
+
+

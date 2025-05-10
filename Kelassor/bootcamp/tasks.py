@@ -3,7 +3,7 @@ from django.conf import settings
 from celery.exceptions import Retry
 import time
 from kavenegar import KavenegarAPI, APIException, HTTPException
-from .models import SMSLog
+from .models import SMSLog, ClassNotifications
 
 api = KavenegarAPI(settings.KAVENEGAR_API_KEY)
 
@@ -43,3 +43,23 @@ def send_sms_to_user(self, phone, full_name):#ارسال پیام به یوزر 
             self.retry(exc=e) 
         except Retry:
             return {"status":"failed", "reason":str(e)}    
+        
+
+
+
+
+@shared_task(bind=True, max_retries=4, default_retry_delay=60)
+def send_sms_notification(notification_id):
+    try:
+        notification = ClassNotifications.objects.get(id=notification_id)
+        phone_number = notification.bootcampRegistration.phone_number.as_e164
+        api = KavenegarAPI(settings.KAVENEGAR_API_KEY)
+        api.sms_send({
+            'receptor': phone_number,
+            'message': notification.admin_message
+        })
+        notification.status = 'sent'
+        notification.save()
+    except APIException as e:
+        notification.status = 'failed'
+        notification.save()

@@ -7,4 +7,5 @@ admin.site.register(Bootcamp)
 admin.site.register(BootcampCategory)
 admin.site.register(SMSLog)
 admin.site.register(BootcampRegistration)
+admin.site.register(ClassNotifications)
 
