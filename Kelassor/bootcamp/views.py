@@ -219,3 +219,10 @@ class ListSMSLogView(ListAPIView):
     queryset = SMSLog.objects.all()
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser", "SupportPanel")]
     serializer_class = SMSLogSerializer
+
+
+
+class DeleteSMSLogView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, GroupPermission("SuperUser", "SupportPanel")]
+    queryset = SMSLog.objects.all()
+    serializer_class = SMSLogSerializer
