@@ -1,6 +1,6 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .serializers import TickectSerializer, TicketCreateSerializer, TicketMessageSerializer
+from .serializers import TickectSerializer, TicketCreateSerializer, TicketMessageSerializer, AdminTicketMessageResponseSerializer
 from account.permissions import GroupPermission
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -84,6 +84,33 @@ class CreateMessageTicketView(CreateAPIView):
                     sender=self.request.user,
                     ticket=ticket
                 )
-        
 
+
+
+
+        
+    
+class ListTicketMessageView(ListAPIView):
+    serializer_class = TicketMessageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = TicketMessage.objects.select_related('ticket')
+        if user.groups.filter(name__in=["SupportPanel", "SuperUser"]).exists():
+            return TicketMessage.objects.all()
+        return TicketMessage.objects.filter(ticket__user=user)
+    
+
+
+
+
+class AdminRespondToTicketMessageView(UpdateAPIView):
+    queryset = TicketMessage.objects.all()
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    serializer_class = AdminTicketMessageResponseSerializer
+
+
+    def perform_update(self, serializer):
+        serializer.save(admin=self.request.user)
         

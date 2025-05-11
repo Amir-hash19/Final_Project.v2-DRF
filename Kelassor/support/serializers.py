@@ -56,3 +56,32 @@ class TicketMessageSerializer(ModelSerializer):
 
 
 
+
+
+class TicketMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TicketMessage
+        fields = "__all__"
+        read_only_fields = ["sebder", "slug", "admin"]
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        user = self.context['request'].user
+
+
+        if not (user and user.is_authenticated and user.groups.filter(name__in=["SupportPanel", "SuperUser"]).exists()):
+            self.fields.pop('admin', None)
+            self.fields.pop('admin_response', None)
+
+
+
+
+
+
+class AdminTicketMessageResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TicketMessage
+        fields = ["admin", "admin_response"]
+        read_only_fields = []
+        
