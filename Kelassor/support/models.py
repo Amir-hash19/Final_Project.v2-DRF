@@ -14,7 +14,7 @@ class Ticket(models.Model):
     )
     title = models.CharField(max_length=100)
     description = models.TextField()
-    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, name="clients-tikect")
+    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, related_name="ticket_owner", null=True)
     bootcamp = models.ForeignKey(to=Bootcamp, null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=TICKET_STATUS_CHOICES, default="pending")

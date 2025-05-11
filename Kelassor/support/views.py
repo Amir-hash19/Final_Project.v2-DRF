@@ -1,6 +1,6 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .serializers import TickectSerializer, TicketCreateSerializer, TicketMessageSerializer, AdminTicketMessageResponseSerializer
+from .serializers import TicketSerializer, TicketCreateSerializer, TicketMessageSerializer, AdminTicketMessageResponseSerializer
 from account.permissions import GroupPermission
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -9,8 +9,9 @@ from rest_framework import viewsets
 from .models import Ticket, TicketMessage
 from account.views import CustomPagination
 from rest_framework.exceptions import ValidationError
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.response import Response
+from django.db import transaction
 from django.db import transaction
 from bootcamp.models import Bootcamp, BootcampRegistration
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -22,30 +23,25 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 class CreateTickectView(CreateAPIView):
     queryset = Ticket.objects.all()
-    serializer_class = TickectSerializer
+    serializer_class = TicketSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        bootcamp_title = self.request.data.get('bootcamp_title') 
 
-        registrations = BootcampRegistration.objects.filter(bootcamp=bootcamp, status='pending')
 
-        try:
-            bootcamp = Bootcamp.objects.get(title=bootcamp_title)
-        except Bootcamp.DoesNotExist:
-            return Response({"detail":"BootCamp not found"}, status=status.HTTP_404_NOT_FOUND)    
-        
-        if not registrations:
-            return Response({"detail": "No registrations are in pending status for this bootcamp."},
-                           status=status.HTTP_400_BAD_REQUEST)
-        
-        with transaction.atomic():
-            serializer.save(
-                user=self.request.user, bootcamp=bootcamp
-            )
-                            
+class DeleteTicketView(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TicketSerializer
+    
+    def get_object(self):
+        return self.request.user
 
-        
+
+
+
+class AdminTicketMessageResponseView(UpdateAPIView):
+    queryset = TicketMessage.objects.all()
+    serializer_class = AdminTicketMessageResponseSerializer
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
 
 
 
@@ -113,4 +109,7 @@ class AdminRespondToTicketMessageView(UpdateAPIView):
 
     def perform_update(self, serializer):
         serializer.save(admin=self.request.user)
-        
+
+
+
+

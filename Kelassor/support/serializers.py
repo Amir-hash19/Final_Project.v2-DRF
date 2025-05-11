@@ -1,14 +1,30 @@
 from rest_framework.serializers import ModelSerializer
-from models import Ticket, TicketMessage
+from .models import Ticket, TicketMessage
 from rest_framework import serializers
 from bootcamp.models import Bootcamp
 from account.models import CustomUser
+from django.utils.text import slugify
+from django.db import transaction
+import uuid
 
 
-class TickectSerializer(ModelSerializer):
-    model = Ticket
-    fields = "__all__"
-    read_only_fields = ["user", "slug"]
+
+class TicketSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model = Ticket
+        fields = ['id', 'title', 'description', 'bootcamp', 'status', 'slug', 'user']
+        read_only_fields = ['status', 'slug', 'user'] 
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            user = self.context['request'].user
+            title = validated_data.get('title', '')
+            slug = slugify(title) + "-" + str(uuid.uuid4())[:8]  # یکتا و خوانا
+            validated_data['slug'] = slug
+            ticket = Ticket.objects.create(user=user, **validated_data)
+            return ticket
+
 
 
 
@@ -34,14 +50,6 @@ class TicketCreateSerializer(serializers.HyperlinkedModelSerializer):
     
 
 
-
-class TicketSerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.HyperlinkedRelatedField(view_name='user-detail', queryset=CustomUser.objects.all())
-    bootcamp = serializers.HyperlinkedRelatedField(view_name='bootcamp-detail', queryset=Bootcamp.objects.all(), required=False)
-
-    class Meta:
-        model = Ticket
-        fields = ['url', 'title', 'description', 'user', 'bootcamp', 'created_at', 'status', 'slug']
 
 
 
@@ -84,4 +92,3 @@ class AdminTicketMessageResponseSerializer(serializers.ModelSerializer):
         model = TicketMessage
         fields = ["admin", "admin_response"]
         read_only_fields = []
-        
