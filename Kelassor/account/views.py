@@ -30,8 +30,6 @@ class CustomPagination(PageNumberPagination):
 
 
 
-
-
 class CreateGroupViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser")]
     serializer_class = GroupSerializer
@@ -39,9 +37,6 @@ class CreateGroupViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
-
-
-
 
 
 
