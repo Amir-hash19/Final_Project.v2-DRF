@@ -1,6 +1,7 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .serializers import TicketSerializer, TicketCreateSerializer, TicketMessageSerializer, AdminTicketMessageResponseSerializer
+from .serializers import (TicketSerializer ,TicketMessageCreateSerializer, TicketMessageSerializer, 
+                                            AdminEditableTicketMessageSerializer, TicketMessageCreateSerializer)
 from account.permissions import GroupPermission
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -64,10 +65,6 @@ class EditTicketView(UpdateAPIView):
         
 
 
-
-
-
-
 class CreateTicketMessageView(CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TicketMessageSerializer
@@ -88,18 +85,12 @@ class CreateTicketMessageView(CreateAPIView):
 
 
 
-
-
-
-
-
-
-class ListTickectViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.all()
-    serializer_class = TicketCreateSerializer
+class ListTicketMessageView(ListAPIView):
+    queryset = TicketMessage.objects.all()
+    serializer_class = TicketMessageCreateSerializer
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    search_fields = ["description", "title"]
+    search_fields = ["message", "title"]
     filterset_fields = ["created_at"]
     ordering_fields = ["-created_at"]
     
@@ -108,7 +99,11 @@ class ListTickectViewSet(viewsets.ModelViewSet):
 
         
 
-
+class AdminResponseMessageView(UpdateAPIView):
+    queryset = TicketMessage.objects.all()
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    serializer_class = AdminEditableTicketMessageSerializer
+    lookup_field = 'slug'
 
 
         

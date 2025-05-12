@@ -29,26 +29,12 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 
-class TicketCreateSerializer(serializers.HyperlinkedModelSerializer):
-    bootcamp = serializers.HyperlinkedRelatedField(
-        queryset=Bootcamp.objects.all(),
-        view_name='bootcamp-detail',  
-        required=False,
-        allow_null=True
-    )
+class TicketMessageCreateSerializer(serializers.ModelSerializer):
+    ticket = TicketSerializer(read_only=True)
 
     class Meta:
-        model = Ticket
-        fields = ['url', 'title', 'description', 'bootcamp', 'slug']
-        extra_kwargs = {
-            'url': {'view_name': 'ticket-detail'},  
-        }
-
-    def create(self, validated_data):
-        user = self.context['request'].user
-        return Ticket.objects.create(user=user, **validated_data)
-    
-
+        model = TicketMessage
+        fields = ["sender", "message", "ticket", "title", "attachment", "created_at", "slug"]
 
 
 
@@ -97,9 +83,38 @@ class TicketMessageSerializer(ModelSerializer):
 
 
 
-
-class AdminTicketMessageResponseSerializer(serializers.ModelSerializer):
+class AdminEditableTicketMessageSerializer(serializers.ModelSerializer):
+    admin = serializers.StringRelatedField(read_only=True)
+    sender = serializers.StringRelatedField(read_only=True)
+    ticket = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = TicketMessage
-        fields = ["admin", "admin_response"]
-        read_only_fields = []
+        fields = [
+            'id',
+            'ticket',
+            'sender',
+            'message',
+            'attachment',
+            'created_at',
+            'title',
+            'slug',
+            'admin',
+            'admin_response',
+        ]
+        read_only_fields = [
+            'id',
+            'ticket',
+            'sender',
+            'message',
+            'attachment',
+            'created_at',
+            'title',
+            'slug',
+            'admin',  # فقط نمایش داده می‌شه، ولی ست میشه از request.user
+        ]
+
+
+
+    def update(self, instance, validated_data):
+        validated_data['admin'] = self.context['request'].user
+        return super().update(instance, validated_data)
