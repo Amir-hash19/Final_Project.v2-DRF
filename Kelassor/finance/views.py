@@ -89,7 +89,7 @@ class AdminListPaymentView(ListAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = PaymentSerializer
 
-
+    
 
 
 class ListPaymentView(ListAPIView):
@@ -175,4 +175,7 @@ class DetailTransactionView(RetrieveAPIView):
 
     def get_queryset(self):
         return Invoice.objects.filter(client=self.request.user)
+
+
+
 
