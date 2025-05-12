@@ -43,6 +43,8 @@ class TicketMessageCreateSerializer(serializers.ModelSerializer):
 
 class TicketMessageSerializer(ModelSerializer):
     ticket = serializers.SlugRelatedField(slug_field='slug', read_only=True)
+    admin = serializers.StringRelatedField(read_only=True)
+    sender = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = TicketMessage
