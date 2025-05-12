@@ -56,7 +56,7 @@ class Transaction(models.Model):
     transaction_date = models.DateTimeField(auto_now_add=True)
     transaction_type = models.CharField(max_length=10, choices=[('credit', 'Credit'), ('debit', 'Debit')])
     is_verified = models.BooleanField(default=False)
-
+    slug = models.SlugField(unique=True)
 
     def __str__(self):
         return f"{self.transaction_type}"
