@@ -35,7 +35,7 @@ def generate_transaction_slug(sender, instance, **kwargs):
     if not instance.slug:
         date_part = datetime.now().strftime("%Y%m%d")
         uuid_part = str(uuid.uuid4())[:8]
-        instance.slug = slugify(f"payment-{date_part}-{uuid_part}")
+        instance.slug = slugify(f"transaction-{date_part}-{uuid_part}")
 
 
 

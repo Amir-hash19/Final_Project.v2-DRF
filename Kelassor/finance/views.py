@@ -150,6 +150,29 @@ class ListInvoiceUserView(ListAPIView):
 class DetailPaymentView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PaymentSerializer
+    lookup_field = 'slug'
 
     def get_queryset(self):
         return Payment.objects.filter(user=self.request.user)
+
+
+
+
+class DetailInvoiceView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = InvoiceSerializer
+    lookup_field = 'slug' 
+
+    def get_queryset(self):
+        return Invoice.objects.select_related('client').filter(client=self.request.user)
+    
+
+
+class DetailTransactionView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = InvoiceSerializer
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        return Invoice.objects.filter(client=self.request.user)
+
