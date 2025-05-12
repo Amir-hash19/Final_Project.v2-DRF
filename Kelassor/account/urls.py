@@ -1,8 +1,12 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .views import (RegisterAccountView, EditAccountView, LogOutView, DeleteAccountView, DetailAccountView, 
                     ListSupportAccountView, SendOTPLogInView, VerifyOTPView, PromoteUserView, DeleteSupportPanelView, AdminLogOutView)
 from rest_framework_simplejwt.views import TokenRefreshView
+from .views import CreateGroupViewSet
 
+router = DefaultRouter()
+router.register(r"groups", CreateGroupViewSet)
 urlpatterns = [
     path("create-account/", RegisterAccountView.as_view(), name="create-account"),
     path("edit-account/", EditAccountView.as_view(), name="edit-account"),
@@ -15,6 +19,7 @@ urlpatterns = [
     path("verify-code/", VerifyOTPView.as_view(), name="verify-otp"),
     path("promote-to-superuser/", PromoteUserView.as_view(), name="change-to-superuser"),
     path("delete-supportpanel-user/<int:pk>/", DeleteSupportPanelView.as_view(), name="delete-supportpanel-user-by-superuser"),
-    path("logout-admin/", AdminLogOutView.as_view(), name="logout-admin-view")
+    path("logout-admin/", AdminLogOutView.as_view(), name="logout-admin-view"),
+    path("", include(router.urls))
 
 ]    

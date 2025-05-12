@@ -6,13 +6,15 @@ from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import Group
 from .models import CustomUser
 from .serializers import (CreateAccountSerializer, EditAccountSerializer, CustomAccountSerializer,
-                           SupportPanelSerializer, OTPSerializer, VerifyOTPSerializer, PromoteUserSerializer)
+                           SupportPanelSerializer, OTPSerializer, VerifyOTPSerializer, PromoteUserSerializer, GroupSerializer)
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .permissions import GroupPermission
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import Group
 from rest_framework.pagination import PageNumberPagination
+from rest_framework import viewsets
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -28,8 +30,22 @@ class CustomPagination(PageNumberPagination):
 
 
 
-#ساختن اکانت عادی برای کاربر نرمال 
 
+
+class CreateGroupViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, GroupPermission("SuperUser")]
+    serializer_class = GroupSerializer
+    queryset = Group.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+
+
+
+
+#ساختن اکانت عادی برای کاربر نرمال 
 class RegisterAccountView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
