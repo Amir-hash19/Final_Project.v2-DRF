@@ -64,6 +64,16 @@ class Transaction(models.Model):
 
 
 
+
+
+
+
+
+
+
+
+
+
 class Wallet(models.Model):
     class WalletStatus(models.TextChoices):
         ACTIVE = 'active', _('Active')
