@@ -65,7 +65,7 @@ def validate_iranian_national_id(value):
     
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=150, validators=[validate_username_with_special_characters],unique=True, null=True, blank=True)
+    username = models.CharField(max_length=150, validators=[validate_username_with_special_characters],unique=True, default="example_username")
     password = models.CharField(max_length=128, null=True, blank=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=80)
