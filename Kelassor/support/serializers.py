@@ -51,15 +51,6 @@ class TicketMessageSerializer(ModelSerializer):
         fields = "__all__"
         read_only_fields = ["sender", "slug", "admin_response", "admin", "message_status"]
 
-    def create(self, validated_data):
-        user = self.context['request'].user
-        validated_data['sender'] = user
-
-        title = validated_data.get('title') or "message"
-        slug = slugify(title) + "-" + str(uuid.uuid4())[:8]
-        validated_data['slug'] = slug
-
-        return super().create(validated_data)
 
 
 
