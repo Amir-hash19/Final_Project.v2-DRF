@@ -13,7 +13,7 @@ class TicketSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Ticket
-        fields = ['id', 'title', 'description', 'bootcamp', 'status', 'slug', 'user']
+        fields = ['title', 'description', 'bootcamp', 'status', 'slug', 'user']
         read_only_fields = ['status', 'slug', 'user'] 
 
     def create(self, validated_data):

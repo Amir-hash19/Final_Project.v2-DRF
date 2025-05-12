@@ -38,10 +38,27 @@ class DeleteTicketView(DestroyAPIView):
 
 
 
-class AdminTicketMessageResponseView(UpdateAPIView):
-    queryset = TicketMessage.objects.all()
-    serializer_class = AdminTicketMessageResponseSerializer
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+
+
+class ListTicketView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TicketSerializer
+    pagination_class = CustomPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["title", "slug"]
+    filterset_fields = ["created_at", "status"]
+    ordering_fields = ["-created_at"]
+    def get_queryset(self):   
+        return Ticket.objects.filter(user=self.request.user)
+    
+        
+
+
+
+
+
+
+
 
 
 
@@ -62,54 +79,9 @@ class ListTickectViewSet(viewsets.ModelViewSet):
         
 
 
-class CreateMessageTicketView(CreateAPIView):
-    queryset = TicketMessage.objects.all()
-    permission_classes = [IsAuthenticated]
-    serializer_class = TicketMessageSerializer  
-
-    def perform_create(self, serializer):
-            
-            title = self.request.data.get('title')
-            if not title:
-                raise ValidationError({"title":"this fields is required"})
-            
-            ticket = get_object_or_404(Ticket, title=title, user=self.request.user)
-
-            with transaction.atomic():
-                serializer.save(
-                    sender=self.request.user,
-                    ticket=ticket
-                )
-
-
 
 
         
-    
-class ListTicketMessageView(ListAPIView):
-    serializer_class = TicketMessageSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        queryset = TicketMessage.objects.select_related('ticket')
-        if user.groups.filter(name__in=["SupportPanel", "SuperUser"]).exists():
-            return TicketMessage.objects.all()
-        return TicketMessage.objects.filter(ticket__user=user)
-    
-
-
-
-
-class AdminRespondToTicketMessageView(UpdateAPIView):
-    queryset = TicketMessage.objects.all()
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
-    serializer_class = AdminTicketMessageResponseSerializer
-
-
-    def perform_update(self, serializer):
-        serializer.save(admin=self.request.user)
-
 
 
 
