@@ -56,31 +56,42 @@ class TicketCreateSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TicketMessageSerializer(ModelSerializer):
+    ticket = serializers.SlugRelatedField(slug_field='slug', read_only=True)
+
     class Meta:
         model = TicketMessage
         fields = "__all__"
-        read_only_fields = ["sender", "slug", "ticket"]
+        read_only_fields = ["sender", "slug", "admin_response", "admin"]
 
-
-
-
-
-
-class TicketMessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TicketMessage
-        fields = "__all__"
-        read_only_fields = ["sebder", "slug", "admin"]
-
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def create(self, validated_data):
         user = self.context['request'].user
+        validated_data['sender'] = user
+
+        title = validated_data.get('title') or "message"
+        slug = slugify(title) + "-" + str(uuid.uuid4())[:8]
+        validated_data['slug'] = slug
+
+        return super().create(validated_data)
 
 
-        if not (user and user.is_authenticated and user.groups.filter(name__in=["SupportPanel", "SuperUser"]).exists()):
-            self.fields.pop('admin', None)
-            self.fields.pop('admin_response', None)
+
+
+
+# class TicketMessageSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = TicketMessage
+#         fields = "__all__"
+#         read_only_fields = ["sebder", "slug", "admin"]
+
+
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         user = self.context['request'].user
+
+
+#         if not (user and user.is_authenticated and user.groups.filter(name__in=["SupportPanel", "SuperUser"]).exists()):
+#             self.fields.pop('admin', None)
+#             self.fields.pop('admin_response', None)
 
 
 
