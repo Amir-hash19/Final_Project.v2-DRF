@@ -1,5 +1,5 @@
 from .models import Payment, Invoice, Transaction
-from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView, UpdateAPIView
 from account.permissions import GroupPermission
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status 
@@ -9,7 +9,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from account.views import CustomPagination
 from rest_framework.exceptions import ValidationError
 from account.models import CustomUser
-from .serializers import InvoiceSerializer, BasicUserSerializer, PaymentSerializer, TransactionSerializer
+from .serializers import (InvoiceSerializer, BasicUserSerializer, PaymentSerializer, TransactionSerializer, 
+                          InvoiceUpdateSerializer)
 from django.db.models import Count
 
 
@@ -92,3 +93,11 @@ class ListTransactionView(ListAPIView):
     
     def get_queryset(self):
         return Transaction.objects.filter(user=self.request.user)
+    
+
+
+class EditInvoicesView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, GroupPermission("SuperUser", "SupportPanel")]
+    queryset = Invoice.objects.all()
+    serializer_class = InvoiceUpdateSerializer
+    lookup_field = 'slug'

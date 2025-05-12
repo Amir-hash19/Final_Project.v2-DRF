@@ -19,6 +19,8 @@ class InvoiceSerializer(ModelSerializer):
 
 
 
+
+
 class BasicUserSerializer(serializers.ModelSerializer):
     invoice_count = serializers.IntegerField(read_only=True)
     class Meta:
@@ -67,3 +69,20 @@ class TransactionSerializer(ModelSerializer):
     class Meta:
         model = Transaction
         fields = ["user", "amount", "description", "transaction_date", "transaction_type", "is_verified"]
+
+
+
+class InvoiceUpdateSerializer(ModelSerializer):
+    class Meta:
+        model = Invoice
+        fields = "__all__"
+        read_only_fields = ["client", "amount", "deadline", "description", "created_at", "slug"]
+
+
+    def update(self, instance, validated_data):
+        is_paid = validated_data.get('is_paid', None)
+        if is_paid is not None:
+            instance.is_paid = is_paid    
+
+        instance.save()
+        return instance    
