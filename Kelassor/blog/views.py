@@ -119,3 +119,7 @@ class AdminListBlogView(ListAPIView):
     search_fields = ["title", "status", "content"]
     filterset_fields = ["status", "date_added"]
     ordering_fields = ["-date_added"]
+
+
+
+
