@@ -1,6 +1,6 @@
 from django.urls import path, include
 from .views import (CreateTickectView, DeleteTicketView, ListTicketView, EditTicketView, CreateTicketMessageView,
-                     CreateTicketMessageView, AdminResponseMessageView)
+                     CreateTicketMessageView, AdminResponseMessageView, AdminDetailMessageView)
 from rest_framework.routers import DefaultRouter
 from .views import  ListTicketMessageView
 
@@ -16,6 +16,7 @@ urlpatterns = [
     path("create-message/<slug:slug>/reply/", CreateTicketMessageView.as_view(), name="create-ticket-message"),
     path("list-ticket-message/", ListTicketMessageView.as_view(), name="list-ticket-message"),
     path("response-to-messages/<slug:slug>/", AdminResponseMessageView.as_view(), name="response-messages"),
+    path("messages/details/<slug:slug>/", AdminDetailMessageView.as_view(), name="detail-message-for-admin"),
 
     
 ]

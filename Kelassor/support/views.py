@@ -91,7 +91,7 @@ class ListTicketMessageView(ListAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["message", "title"]
-    filterset_fields = ["created_at"]
+    filterset_fields = ["created_at", "message_status"]
     ordering_fields = ["-created_at"]
     
 
@@ -110,3 +110,8 @@ class AdminResponseMessageView(UpdateAPIView):
 
 
 
+class AdminDetailMessageView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    queryset = TicketMessage.objects.all()
+    serializer_class = TicketMessageSerializer
+    lookup_field = 'slug'
