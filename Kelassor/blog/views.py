@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from .serializers import BlogCategorySerializer, UploadBlogSerializer, BlogSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from django.http import FileResponse
+from rest_framework.response import Response
 from .models import CategoryBlog, Blog
 from account.views import CustomPagination
 
@@ -123,3 +125,18 @@ class AdminListBlogView(ListAPIView):
 
 
 
+class BlogDownloadView(APIView):
+    def get(self, request, slug, format=None):
+        try:
+            blog = Blog.objects.get(slug=slug) 
+            file_path = blog.file.path
+
+            if blog.file:
+                response = FileResponse(open(file_path, 'rb'), as_attachment=True)
+                response['Content-Type'] = 'application/octet-stream'
+                response['Content-Disposition'] = f'attachment; filename="{blog.file.name}"'
+                return response
+            else:
+                return Response({"detail":"No file available for this blog."}, status=404)
+        except Blog.DoesNotExist:
+            return Response({'detail': 'Blog not found.'}, status=404)    
