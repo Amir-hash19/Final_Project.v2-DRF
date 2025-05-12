@@ -19,3 +19,8 @@ class InvoiceSerializer(ModelSerializer):
 
 
 
+class BasicUserSerializer(serializers.ModelSerializer):
+    invoice_count = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', "invoice_count"]

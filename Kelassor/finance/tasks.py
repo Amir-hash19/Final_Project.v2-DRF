@@ -15,7 +15,7 @@ def send_sms_for_invoice_task(self, phone_client, last_name):
     api_key = os.getenv('KAVENEGAR_API_KEY')  
     client = KavenegarAPI(api_key)
     cache_key = f"welcome_sms:{phone_client}"
-    message = f"This message from kelassor, new invoice created for you please check your panel-->{https://kelaasor.com/}<--"
+    message = f"This message from kelassor, new invoice created for you please check your panel-->'https://kelaasor.com/'<--"
 
     try:
         params = {
