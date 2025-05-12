@@ -61,3 +61,9 @@ class PaymentSerializer(ModelSerializer):
 
 
 
+
+class TransactionSerializer(ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model = Transaction
+        fields = ["user", "amount", "description", "transaction_date", "transaction_type", "is_verified"]

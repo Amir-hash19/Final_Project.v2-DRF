@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import CreateInvoiceView, ListUserWithInvoiceView, DeleteInvoiceView, CreatePaymentView
+from .views import( CreateInvoiceView, ListUserWithInvoiceView, DeleteInvoiceView,
+                    CreatePaymentView, AdminListPaymentView, ListPaymentView, ListTransactionView)
 
 
 urlpatterns = [
@@ -7,4 +8,7 @@ urlpatterns = [
     path("list-user-invoices/", ListUserWithInvoiceView.as_view(), name="list-users-with-invoices"),
     path("delete-invoice/<slug:slug>/", DeleteInvoiceView.as_view(), name="delete-invoice-by-admin"),
     path("create/<slug:slug>/payment/", CreatePaymentView.as_view(), name="create-payment"),
+    path("list-payments/", AdminListPaymentView.as_view(), name="list-payments-for-admin"),
+    path("list-payments-user/", ListPaymentView.as_view(), name="list-payment-user"),
+    path("list-transactions/", ListTransactionView.as_view(), name="list-transactions-user")
 ]
