@@ -31,6 +31,15 @@ class Ticket(models.Model):
 class TicketMessage(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, related_name="customer_sender")
+
+    MESSAGE_STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("answered", "Answered"),
+        ("notanswered", "NotAnswered"),
+        ("closed", "Closed")
+    )
+
+    message_status = models.CharField(max_length=20, choices=MESSAGE_STATUS_CHOICES, default="pending")
     message = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     attachment = models.FileField(upload_to='ticket_attachments/', null=True, blank=True)

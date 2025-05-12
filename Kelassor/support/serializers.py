@@ -47,7 +47,7 @@ class TicketMessageSerializer(ModelSerializer):
     class Meta:
         model = TicketMessage
         fields = "__all__"
-        read_only_fields = ["sender", "slug", "admin_response", "admin"]
+        read_only_fields = ["sender", "slug", "admin_response", "admin", "message_status"]
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -100,6 +100,7 @@ class AdminEditableTicketMessageSerializer(serializers.ModelSerializer):
             'slug',
             'admin',
             'admin_response',
+            'message_status'
         ]
         read_only_fields = [
             'id',
