@@ -53,15 +53,6 @@ class RegisterAccountView(APIView):
 
                 refresh = RefreshToken.for_user(user)
 
-                if is_supportpanel_user(user):
-                    AdminActivityLog.objects.create(
-                        admin_user=user,
-                        action="Register",
-                        detail="User registred and got token",
-                        ip_address=request.META.get("REMOTE_ADDR"),
-                        user_agent=request.META.get("HTTP_USER_AGENT")
-                    )
-
                 return Response({
                     "user": serializer.data,
                     "refresh": str(refresh),

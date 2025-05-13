@@ -37,15 +37,6 @@ class PaymentSerializer(ModelSerializer):
         fields = "__all__"
         read_only_fields = ["slug", "user", "invoice"]
 
-    def validate_invoice(self, invoice):
-        request = self.context["request"]
-        user = request.user
-
-
-        if invoice.client != user:
-            raise serializers.ValidationError("You have to choose your invoices!")
-        return invoice
-    
     def validate(self, data):
         method = data.get("method")
         tracking_code = data.get("tracking_code")
