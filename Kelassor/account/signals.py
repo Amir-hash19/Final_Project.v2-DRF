@@ -1,4 +1,6 @@
 from django.db.models.signals import post_save
+from django.utils.timezone import now
+from .permissions import is_supportpanel_user
 from django.dispatch import receiver
 from .models import CustomUser
 from .tasks import send_welcome_sms_task
@@ -26,3 +28,8 @@ def generate_slug_customeuser(sender, instance, **kwargs):
         base_slug = slugify(instance.username)
         unique_suffix = str(uuid.uuid4())[:8]
         instance.slug = slugify(f"{base_slug}-{unique_suffix}")
+
+
+
+
+

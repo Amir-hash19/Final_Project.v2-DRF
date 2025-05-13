@@ -4,13 +4,13 @@ from .OTPThrottle import OTPThrottle
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import Group
-from .models import CustomUser
+from .models import CustomUser, AdminActivityLog
 from .serializers import (CreateAccountSerializer, EditAccountSerializer, CustomAccountSerializer,
                            SupportPanelSerializer, OTPSerializer, VerifyOTPSerializer, PromoteUserSerializer, GroupSerializer)
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from .permissions import GroupPermission
+from .permissions import GroupPermission, is_supportpanel_user
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import Group
 from rest_framework.pagination import PageNumberPagination
@@ -50,7 +50,16 @@ class RegisterAccountView(APIView):
                 user = serializer.save()
 
                 refresh = RefreshToken.for_user(user)
-          
+
+                if is_supportpanel_user(user):
+                    AdminActivityLog.objects.create(
+                        admin_user=user,
+                        action="Register",
+                        detail="User registred and got token",
+                        ip_address=request.META.get("REMOTE_ADDR"),
+                        user_agent=request.META.get("HTTP_USER_AGENT")
+                    )
+
                 return Response({
                     "user": serializer.data,
                     "refresh": str(refresh),
@@ -79,14 +88,29 @@ class LogOutView(APIView):
     def post(self, request):
         try:
             refresh_token = request.data.get('refresh_token')
-            if refresh_token:
-                token = RefreshToken(refresh_token)
-                token.blacklist()
-            return Response({"details":"User Logged Out Successfully!"})
-        except Exception as e:
-            return Response({"details": "Error during logout, please try again later."}, status=500)
+            if not refresh_token:
+                return Response({"detail": "Refresh token is required."}, status=400)
 
-        
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            # ثبت لاگ اگر کاربر عضو supportpanel بود
+            user = request.user
+            if is_supportpanel_user(user):
+                AdminActivityLog.objects.create(
+                    user=user,
+                    action="Logout",
+                    detail="User manually logged out",
+                    ip_address=request.META.get("REMOTE_ADDR"),
+                    user_agent=request.META.get("HTTP_USER_AGENT")
+                )
+
+            return Response({"detail": "User Logged Out Successfully!"})
+        except Exception as e:
+            return Response({"detail": "Error during logout, please try again later."}, status=500)
+
+
+
 
 
 
@@ -179,6 +203,17 @@ class VerifyOTPView(APIView):
                     return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
                 refresh = RefreshToken.for_user(user)
+
+                if is_supportpanel_user(user):
+                    AdminActivityLog.objects.create(
+                        admin_user=user,
+                        action="Login via OTP",
+                        detail="User Successfully logged in using OTP",
+                        ip_address=request.META.get("REMOTE_ADDR"),
+                        user_agent=request.META.get("HTTP_USER_AGENT")
+
+                    )
+
                 return Response({
                     "access": str(refresh.access_token),
                     "refresh": str(refresh),
