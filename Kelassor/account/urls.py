@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (RegisterAccountView, EditAccountView, LogOutView, DeleteAccountView, DetailAccountView, 
-                    ListSupportAccountView, SendOTPLogInView, VerifyOTPView, PromoteUserView, DeleteSupportPanelView, AdminLogOutView)
+                    ListSupportAccountView, ListAdminActivityLogView, SendOTPLogInView, VerifyOTPView, PromoteUserView, DeleteSupportPanelView, AdminLogOutView)
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import CreateGroupViewSet
 
@@ -20,6 +20,7 @@ urlpatterns = [
     path("promote-to-superuser/", PromoteUserView.as_view(), name="change-to-superuser"),
     path("delete-supportpanel-user/<int:pk>/", DeleteSupportPanelView.as_view(), name="delete-supportpanel-user-by-superuser"),
     path("logout-admin/", AdminLogOutView.as_view(), name="logout-admin-view"),
+    path("admin-activity-logs/", ListAdminActivityLogView.as_view(), name="admin-activity-logs"),
     path("", include(router.urls))
 
 ]    

@@ -6,7 +6,8 @@ from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import Group
 from .models import CustomUser, AdminActivityLog
 from .serializers import (CreateAccountSerializer, EditAccountSerializer, CustomAccountSerializer,
-                           SupportPanelSerializer, OTPSerializer, VerifyOTPSerializer, PromoteUserSerializer, GroupSerializer)
+                           SupportPanelSerializer, OTPSerializer, VerifyOTPSerializer, PromoteUserSerializer, 
+                           GroupSerializer, AdminActivityLogSerializer)
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -18,6 +19,7 @@ from rest_framework import viewsets
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
+from django.utils.timezone import now, timedelta
 from rest_framework import status
 from django.db import transaction
 from .OTPThrottle import OTPThrottle
@@ -296,3 +298,21 @@ class AdminLogOutView(APIView):
 
 
 
+class ListAdminActivityLogView(ListAPIView):
+    serializer_class = AdminActivityLogSerializer
+    permission_classes = [IsAuthenticated, GroupPermission("SupperUser")]
+    pagination_class = CustomPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["action", "detail", "user__username", "user__phone"]
+    filterset_fields = ["created_at"]
+    ordering_fields = ["-created_at"]
+
+
+
+    def get_queryset(self):
+        last_72_hours = now() - timedelta(hours=72)
+
+        return AdminActivityLog.objects.filter(
+            user__groups__name="SupportPanel",
+            created_at__gte=last_72_hours
+        )

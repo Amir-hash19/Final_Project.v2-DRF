@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from rest_framework import serializers
 from django.db import IntegrityError
 from django.db import transaction
-from .models import CustomUser
+from .models import CustomUser, AdminActivityLog
 
 User = get_user_model()
 
@@ -131,3 +131,8 @@ class PromoteUserSerializer(serializers.Serializer):
 
 
  
+
+class AdminActivityLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdminActivityLog
+        fields = "__all__"
