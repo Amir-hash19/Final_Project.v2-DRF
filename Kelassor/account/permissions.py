@@ -11,3 +11,10 @@ def GroupPermission(*group_names):
 
             return request.user.groups.filter(name__in=group_names).exists()
     return _DynamicGroupPermission
+
+
+
+
+
+def is_supportpanel_user(user):
+    return user.groups.filter(name="SupportPanel").exists()

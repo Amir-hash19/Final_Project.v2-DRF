@@ -106,7 +106,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 
-class AdminAcrtivityLog(models.Model):
+class AdminActivityLog(models.Model):
     admin_user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE)
     action = models.CharField(max_length=255)
     detail = models.TextField(null=True, blank=True)
