@@ -1,10 +1,7 @@
 from django.contrib import admin
-from .models import Invoice, Payment ,Transaction , Wallet
+from .models import Invoice, Payment ,Transaction
 
 
-
-# admin.site.register(Payment)
-# admin.site.register(Transaction)
 
 
 @admin.register(Invoice)

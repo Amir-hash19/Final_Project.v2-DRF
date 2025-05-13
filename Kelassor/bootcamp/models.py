@@ -13,22 +13,6 @@ class BootcampCategory(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(unique=True)
 
-    def save(self, *args, **kwargs):
-        if  not self.slug or self._state.adding or self.name_has_changed():
-            base_slug = slugify(self.name)
-            unique_slug = base_slug
-            counter = 1
-            while BootcampCategory.objects.filter(slug=unique_slug).exclude(id=self.id).exists():
-                unique_slug = f"{base_slug}-{counter}"
-                counter+=1
-            self.slug = unique_slug
-            super().save(*args, **kwargs)
-
-    def name_has_changed(self):
-        if not self.pk:
-            return True
-        old_name = BootcampCategory.objects.get(pk=self.pk).name
-        return old_name != self.name
 
 
     def __str__(self):
@@ -61,16 +45,6 @@ class Bootcamp(models.Model):
     days = models.CharField(max_length=50)
     slug = models.SlugField(unique=True)
 
-    def post(self, *args, **kwargs):
-        if not self.slug:
-            base_slug = slugify(self.title)
-            unique_slug = base_slug
-            counter = 1
-            while Bootcamp.objects.filter(slug=unique_slug).exists():
-                unique_slug = f"{base_slug}-{counter}"
-                counter+=1
-            self.slug = unique_slug
-            super().save(*args, **kwargs)
 
 
     def __str__(self):
@@ -136,6 +110,7 @@ class SMSLog(models.Model):
     status = models.CharField(max_length=100, choices=STATUS_SMS)
     response_message = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(unique=True)
 
     def __str__(self):
         return f"SMS to {self.phone_number} - {self.status}"
@@ -150,6 +125,7 @@ class ClassNotifications(models.Model):
     admin_message = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=[('pending', 'Pending'), ('sent', 'Sent')], default='pending')
+    slug = models.SlugField(unique=True)
 
 
     def __str__(self):
