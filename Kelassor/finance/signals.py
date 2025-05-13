@@ -47,7 +47,7 @@ def create_transaction_for_payment(sender, created, instance, **kwargs):
             Transaction.objects.create(
                 user=instance.user,
                 amount=instance.amount,
-                description=f"Payment for invoice {instance.invoice.transaction_date}",
+                description=f"Payment for invoice {instance.invoice.created_at}",
                 transaction_type='debit'
             )
         except Exception as e:

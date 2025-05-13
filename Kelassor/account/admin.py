@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser
+from .models import CustomUser, AdminActivityLog
 
 
 @admin.register(CustomUser)
@@ -9,7 +9,9 @@ class CustomeUserAdmin(admin.ModelAdmin):
     ordering = ("-date_joined", )
     search_fields = ("username", "email", "phone")
     list_per_page = 20
-    fields = (("first_name", "last_name", "email", "phone" ),"about_me", "national_id", "birthday", "password", "gender")
+    fields = (("first_name", "last_name", "email", "phone" , "username"),
+            "about_me", "national_id", "birthday", "password", "gender", "is_staff", "is_active", "is_superuser" , "groups")
 
 
+admin.site.register(AdminActivityLog)
     

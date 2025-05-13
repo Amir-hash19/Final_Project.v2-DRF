@@ -7,7 +7,7 @@ from account.views import CustomPagination
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from account.views import CustomPagination
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 from account.models import CustomUser
@@ -48,7 +48,7 @@ class CreatePaymentView(CreateAPIView):
     queryset = Payment.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = PaymentSerializer
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
 
     def perform_create(self, serializer):
