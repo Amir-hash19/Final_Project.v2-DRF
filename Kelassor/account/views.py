@@ -255,3 +255,9 @@ class AdminLogOutView(APIView):
             return Response({"details":"User Logged Out Successfully!"})
         except Exception as e:
             return Response({"details": "Error during logout, please try again later."}, status=500)
+
+
+
+
+
+

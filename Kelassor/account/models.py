@@ -86,16 +86,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     gender = models.CharField(max_length=6, choices=GENDER_TYPE, null=True, blank=True)
     slug = models.SlugField(unique=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            base_slug = slugify(self.email)
-            unique_slug = base_slug
-            counter = 1
-            while CustomUser.objects.filter(slug=unique_slug).exists():
-                unique_slug = f"{base_slug}-{counter}"
-                counter+=1
-            self.slug = unique_slug
-        super().save(*args, **kwargs)        
 
 
 
@@ -113,3 +103,17 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     
 
 
+
+
+
+class AdminAcrtivityLog(models.Model):
+    admin_user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE)
+    action = models.CharField(max_length=255)
+    detail = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=255, null=True, blank=True)
+
+
+    def __str__(self):
+        return f"{self.admin_user} - {self.action} - {self.created_at}"
