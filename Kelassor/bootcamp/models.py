@@ -146,7 +146,7 @@ class SMSLog(models.Model):
 
 class ClassNotifications(models.Model):
     title = models.CharField(max_length=100)
-    bootcampRegistration = models.ForeignKey(to=BootcampRegistration, on_delete=models.PROTECT)
+    bootcampRegistration = models.ForeignKey(to=BootcampRegistration, on_delete=models.PROTECT, null=True, blank=True)
     admin_message = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=[('pending', 'Pending'), ('sent', 'Sent')], default='pending')
