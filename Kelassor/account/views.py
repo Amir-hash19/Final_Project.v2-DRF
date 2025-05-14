@@ -234,6 +234,7 @@ class PromoteUserView(APIView):
         serializer = PromoteUserSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data["email"]
+            group_name = serializer.validated_data.get("group_name")
             
             # بررسی وجود کاربر با ایمیل وارد شده
             try:
