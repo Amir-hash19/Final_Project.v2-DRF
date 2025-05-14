@@ -1,7 +1,8 @@
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.test import APITestCase, APIClient
-from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from rest_framework import status
 from django.urls import reverse
 
 User = get_user_model()
@@ -145,4 +146,37 @@ class RegisterAccountViewTests(APITestCase):
         self.assertIn("group", response.data)
         self.assertEqual(str(response.data["group"][0]), "Group field should not be included in registration data.")
   
+
+
+
+
+class LogOutViewTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="Logoutuser", password="strongpass123", phone="+989351161152"
+        )
         
+        self.refresh=RefreshToken.for_user(self.user)
+        self.access_token=str(self.refresh.access_token)
+        self.refresh_token=str(self.refresh)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.url=reverse("logging-Out")
+
+    def test_user_can_logout_successfully(self):
+        data = {"refresh_token":self.refresh_token}
+        response = self.client.post(self.url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["detail"], "User Logged Out Successfully!")
+
+
+    def test_logout_missing_refresh_token(self):
+        response = self.client.post(self.url, {}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["detail"], "Refresh token is required.")        
+
+
+    def test_logout_invalid_refresh_token(self):
+        response = self.client.post(self.url, {"refresh_token": "fake-token"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn("Error during logout", response.data["detail"])    
