@@ -12,14 +12,14 @@ User = get_user_model()
 
 
 class CreateAccountSerializer(serializers.ModelSerializer):
-    group = serializers.CharField(read_only=True, required=False)
+    group = serializers.CharField(required=False)
    
 
     class Meta:
         model = CustomUser
         fields = [
             "username", "first_name", "last_name", "phone", "email",
-            "about_me", "national_id", "gender","group",
+            "about_me", "national_id", "gender","group"
         ]
         read_only_fields = ['group']
 
@@ -27,22 +27,16 @@ class CreateAccountSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         data["phone"] = str(instance.phone) 
         return data
+    
+    def validate_group(self, value):
+        raise serializers.ValidationError("Group field should not be included in registration data.")
+
 
     @transaction.atomic
     def create(self, validated_data):
-        group_name = validated_data.pop('group', None)
+        validated_data.pop("group", None)  # فقط برای اطمینان
+        return CustomUser.objects.create(**validated_data)
 
-        user = CustomUser.objects.create(**validated_data)
-
-        if group_name:
-            try:
-                group = Group.objects.get(name=group_name)
-                user.groups.add(group)
-            except Group.DoesNotExist:
-                raise serializers.ValidationError(f"Group '{group_name}' does not exist.")
-
-        user.save()
-        return user
 
 
 
