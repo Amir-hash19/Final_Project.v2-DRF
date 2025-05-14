@@ -226,36 +226,50 @@ class VerifyOTPView(APIView):
 
 
 class PromoteUserView(APIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, GroupPermission("SuperUser")]
 
     
     def post(self, request):
+        # دریافت داده‌ها از serializer
         serializer = PromoteUserSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data["email"]
-           
             
+            # بررسی وجود کاربر با ایمیل وارد شده
             try:
                 user = CustomUser.objects.get(email__iexact=email)
             except CustomUser.DoesNotExist:
-                return Response({"detail": "email does not exis!"}, status=status.HTTP_404_NOT_FOUND)
-            
-            if user.is_superuser:
-                return Response({"detail":"This User Already is SuperUser!"})
+                return Response({"detail": "Email does not exist!"}, status=status.HTTP_404_NOT_FOUND)
 
-            user.is_superuser = True
-            user.is_staff = True
+            # اگر کاربر قبلاً سوپر یوزر است
+            if user.is_superuser:
+                return Response({"detail": "This User is already a SuperUser!"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # گرفتن کاربر درخواست‌دهنده
+            requesting_user = request.user
+
+            # بررسی اینکه کاربر درخواست‌دهنده عضو گروه SuperUser باشد
+            if not requesting_user.groups.filter(name="SuperUser").exists():
+                return Response({"detail": "You do not have permission to promote users to SuperUser!"}, status=status.HTTP_403_FORBIDDEN)
+
+            # اضافه کردن کاربر به گروه‌ها و تغییر ویژگی‌های آن‌ها
+            group_name = serializer.validated_data.get("group_name")  # فرض بر این است که گروه در داده‌ها موجود باشد
+            group, _ = Group.objects.get_or_create(name=group_name)
+
+            if group.name == 'SuperUser':
+                user.is_superuser = True
+            elif group.name == 'SupportPanel':
+                user.is_staff = True
+
+            # اضافه کردن کاربر به گروه
+            user.groups.add(group)
             user.save()
 
-            group, _ = Group.objects.get_or_create(name='SupportPanel')
-            user.groups.add(group)
-
             return Response({
-                "detail": f"Client {user.email} has been promoted successfully."
+                "detail": f"User {user.email} has been promoted successfully to {group.name}."
             }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
         
 
 

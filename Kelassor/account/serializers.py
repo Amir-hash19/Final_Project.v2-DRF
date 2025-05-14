@@ -120,6 +120,7 @@ class VerifyOTPSerializer(serializers.Serializer):
 
 class PromoteUserSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
+    group_name = serializers.ChoiceField(choices=["SuperUser", "SupportPanel"])
 
 
     def validate_email(self, value):
