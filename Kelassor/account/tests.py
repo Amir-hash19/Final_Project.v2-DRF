@@ -1,4 +1,4 @@
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -93,3 +93,56 @@ class PromoteUserViewTests(APITestCase):
         })
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+
+
+
+class RegisterAccountViewTests(APITestCase):
+    
+    def test_register_user(self):
+        url = reverse("create-account")
+        data = {
+            "username": "normaluser_@12",
+            "first_name": "Ali",
+            "last_name": "Ahmadi",
+            "phone":'+989121234561',
+            "email": "normal1212@email.com",
+            "about_me": "Normaluser....",
+            "national_id": "8888888888",
+            "gender": "male"
+        }
+
+        response = self.client.post(url, data, format='json')
+    
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["user"]["username"], "normaluser_@12")
+        self.assertIn("refresh", response.data)
+        self.assertIn("access", response.data)
+
+        user = User.objects.get(username="normaluser_@12")
+        self.assertEqual(user.groups.count(), 0)
+       
+    def test_register_user_cannot_groups(self):
+        url = reverse("create-account")    
+
+        data = {
+            "username": "baduser@_22",
+            "first_name": "Reza",
+            "last_name": "Karimi",
+            "phone": "+989961232542",
+            "email": "reza2@email.com",
+            "about_me": "",
+            "national_id": "7777777777",
+            "gender": "male",
+            "group": "anything"
+        }
+
+        response = self.client.post(url , data, format="json")
+          
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("group", response.data)
+        self.assertEqual(str(response.data["group"][0]), "Group field should not be included in registration data.")
+  
+        
