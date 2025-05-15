@@ -9,6 +9,7 @@ from django.http import FileResponse
 from rest_framework.response import Response
 from .models import CategoryBlog, Blog
 from account.views import CustomPagination
+from .filters import CategoryBlogFilter
 
 
 
@@ -50,13 +51,13 @@ class DeleteCategoryBlogView(DestroyAPIView):
 
 
 class ListCateogryBlogView(ListAPIView):
-    queryset = CategoryBlog.objects.all()
+    queryset = CategoryBlog.objects.all().order_by("-date_created")
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = BlogCategorySerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["name"]
-    filterset_fields = ["date_joined"]
+    filterset_class = CategoryBlogFilter
 
     
 
@@ -78,9 +79,10 @@ class EditBlogView(UploadBlogView):
 class DeleteBlogView(DestroyAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = UploadBlogSerializer
+    lookup_field = "slug"
 
     def get_queryset(self):
-        return Blog.objects.filter(user=self.request.user)
+        return Blog.objects.filter(uploaded_by=self.request.user)
     
 
 
@@ -125,18 +127,23 @@ class AdminListBlogView(ListAPIView):
 
 
 
+
 class BlogDownloadView(APIView):
     def get(self, request, slug, format=None):
         try:
-            blog = Blog.objects.get(slug=slug) 
-            file_path = blog.file.path
+            blog = Blog.objects.get(slug=slug)
 
-            if blog.file:
+            if blog.file and hasattr(blog.file, 'path'):
+                file_path = blog.file.path
                 response = FileResponse(open(file_path, 'rb'), as_attachment=True)
                 response['Content-Type'] = 'application/octet-stream'
                 response['Content-Disposition'] = f'attachment; filename="{blog.file.name}"'
                 return response
             else:
-                return Response({"detail":"No file available for this blog."}, status=404)
+                return Response({"detail": "No file available for this blog."}, status=404)
+
         except Blog.DoesNotExist:
-            return Response({'detail': 'Blog not found.'}, status=404)    
+            return Response({'detail': 'Blog not found.'}, status=404)
+        except Exception as e:
+            # اگر ارور دیگه‌ای پیش اومد، می‌تونی اینجا مدیریت کنی
+            return Response({'detail': f'Error: {str(e)}'}, status=500)
