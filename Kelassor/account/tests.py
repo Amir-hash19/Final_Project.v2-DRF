@@ -1,10 +1,11 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.test import APITestCase, APIClient
+from django.utils.timezone import now, timedelta
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from .models import AdminActivityLog
 from rest_framework import status
 from django.urls import reverse
-
 User = get_user_model()
 
 
@@ -180,3 +181,87 @@ class LogOutViewTests(APITestCase):
         response = self.client.post(self.url, {"refresh_token": "fake-token"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertIn("Error during logout", response.data["detail"])    
+
+
+
+
+
+
+
+class AdminActivityLogTests(APITestCase):
+    def setUp(self):
+        # ایجاد گروه‌ها
+        self.supportpanel_group = Group.objects.create(name="SupportPanel")
+        self.SuperUser_group = Group.objects.create(name="SupperUser")
+
+        # ساخت کاربر support_user و افزودن به گروه SupportPanel
+        self.support_user = User.objects.create_user(
+            username="support_@1", password="testali1",
+            email="testali2@email.com", phone="+989955431203",
+            national_id="5555555555"
+        )
+        self.support_user.groups.add(self.supportpanel_group)
+
+        # ساخت کاربر admin_user و افزودن به گروه SuperUser
+        self.admin_user = User.objects.create_superuser(
+            username="admin@12", password="adminpass",
+            email="testadmin1@email.com", phone="+989124321204",
+            national_id="6666666666", slug="test-ali4"
+        )
+        self.admin_user.groups.add(self.SuperUser_group)
+
+        # ایجاد لاگ‌های مختلف
+        self.recent_log = AdminActivityLog.objects.create(
+            admin_user=self.support_user,
+            action="Login",
+            detail="Recent login",
+            ip_address="127.0.0.1",
+            user_agent="test-agent"
+        )
+
+        # ایجاد لاگ قدیمی‌تر
+        old_date = now() - timedelta(days=4)
+        self.old_log = AdminActivityLog.objects.create(
+            admin_user=self.support_user,
+            action="Login",
+            detail="Old login",
+            ip_address="127.0.0.1",
+            user_agent="test-agent2",
+            created_at=old_date
+        )
+
+        # URL برای دسترسی به لاگ‌ها
+        self.url = reverse("admin-activity-logs")
+
+    # def test_superuser_can_see_recent_logs_only(self):
+    #     # وارد شدن به سیستم به عنوان admin_user (عضو گروه SuperUser)
+    #     self.client.force_authenticate(user=self.admin_user)
+    #     response = self.client.get(self.url)
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # # دریافت نتایج و بررسی صحت
+        # results = response.data["results"]
+        # self.assertEqual(len(results), 1)  # انتظار داریم فقط 1 لاگ (Recent login) نمایش داده شود
+        # self.assertEqual(results[0]["detail"], "Recent login")
+
+    def test_user_without_supperuser_group_denied(self):
+        # ایجاد یک کاربر معمولی بدون گروه SuperUser
+        normal_user = User.objects.create_user(
+            username="user", password="pass",
+            phone="+989123456789", national_id="1122334455",
+            email="user@example.com"
+        )
+        self.client.force_authenticate(user=normal_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_unauthorized_user_cannot_access(self):
+        # کاربر خارج از سیستم (بدون لاگین)
+        self.client.logout()  
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+
+
+
