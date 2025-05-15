@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .views import (AddCategoryBlogView, UploadBlogView, DeleteCategoryBlogView, 
                     ListCateogryBlogView, EditBlogView, DeleteBlogView, DetailBlogView, 
                     ListBlogView, AdminListBlogView, BlogDownloadView)
@@ -11,9 +12,14 @@ urlpatterns = [
     path("delete-category/<int:pk>", DeleteCategoryBlogView.as_view(), name="delete-category-blog"),
     path("list-category-blogs/", ListCateogryBlogView.as_view(), name="list-category-blog"),
     path("edit-blog/", EditBlogView.as_view(), name="edit-blog-adminsupport"),
-    path("delete-blog/", DeleteBlogView.as_view(), name="delete-blog"),
+    path("delete-blog/<slug:slug>/", DeleteBlogView.as_view(), name="delete-blog"),
     path("detail-blog/<int:pk>", DetailBlogView.as_view(), name="detail-blog"),
     path("list-blog/", ListBlogView.as_view(), name="list-blogs"),
     path("list-all-blogs/", AdminListBlogView.as_view(), name="list-all-blogs-admin"),
     path('blog/download/<slug:slug>/', BlogDownloadView.as_view(), name='blog-download'),
+
+
+
+
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
 ]
