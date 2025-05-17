@@ -139,15 +139,15 @@ class AdminBootcampRegistrationSerializer(serializers.ModelSerializer):
         model = BootcampRegistration
         fields = ["status", "admin_status_comment"]
 
-    def to_internal_value(self, data):
+    def validate(self, attrs):
         allowed_keys = {'status', 'admin_status_comment'}
-        extra_keys = set(data.keys()) - allowed_keys
-
+        extra_keys = set(self.initial_data.keys()) - allowed_keys
         if extra_keys:
-            raise serializers.ValidationError(
-                f"You are only allowed to update: {', '.join(allowed_keys)}. Extra fields: {', '.join(extra_keys)}"
-            )
-        return super().to_internal_value(data)
+            raise serializers.ValidationError({
+                "extra_fields": f"You are only allowed to update: {', '.join(allowed_keys)}. Extra fields: {', '.join(extra_keys)}"
+            })
+        return attrs
+
             
 
 
