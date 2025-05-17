@@ -173,3 +173,70 @@ class DetailPaymentViewTest(APITestCase):
     def test_get_payment_detail_unauthenticated(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+
+
+
+
+
+class ListInvoiceUserViewTest(APITestCase):
+
+    def setUp(self):
+        self.user1 = User.objects.create_user(username="testuser@17",email="payeruser17@email.com",
+        national_id="8769253419", phone="+989191278845", slug="user5-test"
+        )
+
+        self.user2 = User.objects.create_user(username="testuser@18",email="payeruser18@email.com",
+        national_id="8769253219", phone="+989191274845", slug="user6-test"
+        )
+
+
+
+        Invoice.objects.create(
+            client=self.user1,
+            amount=500,
+            deadline=date.today() + timedelta(days=5),
+            description="Invoice 1",
+            slug="invoice-1"
+        )  
+
+        Invoice.objects.create(
+            client=self.user1,
+            amount=300,
+            deadline=date.today() + timedelta(days=10),
+            description="Invoice 2",
+            slug="invoice-2"
+        )  
+
+        Invoice.objects.create(
+            client=self.user2,
+            amount=800,
+            deadline=date.today() + timedelta(days=3),
+            description="Invoice other",
+            slug="invoice-3"
+        )
+
+        self.url = reverse("list-invoices-user")
+
+
+    def get_token(self, user):
+        return str(RefreshToken.for_user(user).access_token)    
+    
+
+
+    def test_list_invoices_authenticated(self):
+        token = self.get_token(self.user1)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 2)  # چون فقط دو فاکتور متعلق به user1 است
+        self.assertTrue(all(invoice["description"].startswith("Invoice") for invoice in response.data["results"]))
+
+
+
+    def test_list_invoices_unauthenticated(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)    
+
