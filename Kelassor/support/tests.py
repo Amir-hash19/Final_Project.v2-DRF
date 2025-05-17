@@ -4,8 +4,9 @@ from rest_framework.test import APITestCase
 from bootcamp.models import Bootcamp
 from rest_framework import status
 from django.urls import reverse
-from .models import Ticket
-
+from .models import Ticket, TicketMessage
+from django.utils.text import slugify
+import uuid
 
 User = get_user_model()
 
@@ -44,3 +45,82 @@ class CreateTicketAPITest(APITestCase):
 
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+
+
+
+
+class CreateTicketMessageAPITest(APITestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(
+            username="testali2@12", email="testali2@email.com",
+            national_id="8765439212", phone="+989953214365", slug="test-ali2"
+        )
+        self.user2 = User.objects.create_user(
+            username="test-ali3", email="testali3@email.com",
+            national_id="8767896548",phone="+989123398896", slug="test-ali3"
+        )
+
+        
+        self.ticket_user1 = Ticket.objects.create(
+            title="user1 ticket",
+            description="description user1",
+            user=self.user1,
+            slug=slugify("user1 ticket") + "-" + str(uuid.uuid4())[:8]
+        )
+        
+        self.ticket_user2 = Ticket.objects.create(
+            title="user2 ticket",
+            description="description user2",
+            user=self.user2,
+            slug=slugify("user2 ticket") + "-" + str(uuid.uuid4())[:8]
+            
+        )
+
+        refresh = RefreshToken.for_user(self.user1)
+        self.access_token_user1 = str(refresh.access_token)
+
+
+        self.url = lambda slug: reverse("create-ticket-message", kwargs={"slug":slug})
+
+
+
+    def test_create_message_on_own_tikcet(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.access_token_user1}")
+        data = {
+            "message":"hi fuck you",
+            "title":"requested to fuck you",
+        }
+        response = self.client.post(self.url(self.ticket_user1.slug), data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["message"], "hi fuck you")
+        self.assertEqual(response.data["title"], "requested to fuck you")
+        self.assertEqual(response.data["message_status"], "pending")
+        self.assertTrue("slug" in response.data)
+        self.assertEqual(TicketMessage.objects.count(), 1)
+
+
+
+
+    def test_cannot_create_message_for_other_users_ticket(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.access_token_user1}")
+        data={
+            "message":"trying to log in",
+            "title":"bad access"
+        }
+        response = self.client.post(self.url(self.ticket_user2.slug), data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(TicketMessage.objects.count(), 0)
+
+        
+
+
+    def test_unauthenticated_cannot_create_message(self):    
+        data = {
+            "message":"no token access",
+            "title":"unauth"
+        }
+        response = self.client.post(self.url(self.ticket_user1.slug), data)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+            
