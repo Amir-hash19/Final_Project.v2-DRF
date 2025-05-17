@@ -1,5 +1,6 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from rest_framework.test import APITestCase
 from bootcamp.models import Bootcamp
 from rest_framework import status
@@ -123,4 +124,61 @@ class CreateTicketMessageAPITest(APITestCase):
         }
         response = self.client.post(self.url(self.ticket_user1.slug), data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-            
+
+
+
+
+
+
+class AdminResponseMessageAPITest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testusernormal@12", email="normalusertest@email.com",
+            national_id="9821342561", phone="+989956572134", slug="user-test"
+        )
+        self.admin = User.objects.create_user(
+            username="testadmin@12", email="admintest@email.com",
+            national_id="9821142561", phone="+989956572034", slug="admin-test"
+        )
+        group = Group.objects.create(name="SupportPanel")
+        self.admin.groups.add(group)
+
+        self.ticket = Ticket.objects.create(
+            title="test user5",
+            description="test desc",
+            user=self.user,
+            slug=slugify("test user5") + "-" + str(uuid.uuid4())[:8]
+        )
+
+        self.message = TicketMessage.objects.create(
+            ticket=self.ticket,
+            sender=self.user,
+            message='Need help!',
+            title='Problem',
+            slug=slugify("Problem") + "-" + str(uuid.uuid4())[:8],
+        )
+
+        refresh = RefreshToken.for_user(self.admin)
+        self.access_token = str(refresh.access_token)
+
+        self.url = reverse("response-messages", kwargs={"slug":self.message.slug})
+
+
+
+    def test_admin_can_respond_to_ticket_message(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+
+        data = {
+            "admin_response":"We are checking your issue.",
+            "message_status": "answered"
+        }
+
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["admin_response"], "We are checking your issue.")
+        self.assertEqual(response.data["message_status"], "answered")
+        self.assertEqual(response.data["admin"], str(self.admin)) 
+
+
+
