@@ -159,7 +159,7 @@ class MostRequestedBootCampView(ListAPIView):
 
 
 class ListBootCampRegistrationView(ListAPIView):
-    queryset = BootcampRegistration.objects.filter(status='pending')
+    queryset = BootcampRegistration.objects.filter(status='pending').order_by("-registered_at")
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = BootCampRegitrationSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]

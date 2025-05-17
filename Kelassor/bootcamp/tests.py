@@ -105,3 +105,99 @@ class DetailBootCampViewTest(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data['detail'], "Bootcamp nor found !")
+
+
+
+
+
+
+
+class ListBootCampRegistrationViewTest(APITestCase):
+    def setUp(self):
+        # گروه‌ها و کاربران
+        self.group = Group.objects.create(name="SupportPanel")
+        self.superuser = CustomUser.objects.create_user(username="admin@33", email="adminuser6@email.com",
+        is_superuser=True, national_id="8767879875", phone="+989122343221")
+        self.superuser.groups.add(self.group)
+
+        self.user = CustomUser.objects.create_user(username="usernorm@33", email="normuser6@email.com",
+        national_id="8761879875", phone="+989122313221")
+        self.category=BootcampCategory.objects.create(name="testcat", slug="test-slug")
+
+        # توکن JWT برای سوپر یوزر
+        refresh = RefreshToken.for_user(self.superuser)
+        self.token = str(refresh.access_token)
+        self.bootcamp = Bootcamp.objects.create(
+        title="Sample Bootcamp",
+        price=100,
+        capacity=10,
+        category=self.category,  # حتما باید این رو داشته باشی
+        description="Test bootcamp",
+        start_date=date(2025, 1, 1),
+        end_date=date(2025, 2, 1),
+        hours=40,
+        days=20,
+        slug="sample-bootcamp",
+        status="registering",
+        is_online=True,
+    )    
+
+        # نمونه بوتکمپ رجیستر (status pending و غیر pending)
+        self.pending_registration = BootcampRegistration.objects.create(
+            phone_number="1234567890",
+            bootcamp=self.bootcamp,
+            volunteer=self.user,
+            comment="Pending user",
+            payment_type="online",
+            status="pending",
+            reviewed_by=self.superuser,
+            slug="test-bootcamp-registraion12"
+        )
+        self.approved_registration = BootcampRegistration.objects.create(
+            phone_number="0987654321",
+            comment="Approved user",
+            bootcamp=self.bootcamp,
+            volunteer=self.user,
+            payment_type="offline",
+            status="approved",
+            reviewed_by=self.superuser,
+            slug="test-bootcamp-registraion"
+        )
+
+        self.url = reverse('list-boortcamp-regitration')  # اسم روت رو متناسب با پروژه تغییر بده
+
+    def test_access_without_authentication(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_access_without_permission(self):
+        # لاگین با یوزر عادی بدون گروه
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.get_token(self.user)}')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_access_with_permission(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_filter_status_pending(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        response = self.client.get(self.url, {'status': 'pending'})
+        data = response.json()
+        self.assertTrue(all(reg['status'] == 'pending' for reg in data['results']))
+
+    def test_search_phone_number(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        response = self.client.get(self.url, {'search': '1234'})
+        data = response.json()
+        self.assertTrue(any('1234' in reg['phone_number'] for reg in data['results']))
+
+    def test_ordering_registered_at(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        response = self.client.get(self.url, {'ordering': '-registered_at'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def get_token(self, user):
+        refresh = RefreshToken.for_user(user)
+        return str(refresh.access_token)
