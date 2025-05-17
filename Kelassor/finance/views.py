@@ -146,7 +146,7 @@ class ListInvoiceUserView(ListAPIView):
 
 
     def get_queryset(self):
-        return Invoice.objects.filter(client=self.request.user)
+        return Invoice.objects.filter(client=self.request.user).order_by("-created_at")
     
 
 
