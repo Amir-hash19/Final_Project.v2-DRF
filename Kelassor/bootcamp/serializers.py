@@ -6,22 +6,18 @@ from account.models import CustomUser
 
 
 
-class BootcampSerializer(serializers.HyperlinkedModelSerializer):
+class BootcampSerializer(serializers.ModelSerializer):
     instructor = serializers.SlugRelatedField(
         queryset=CustomUser.objects.all(),
         slug_field='last_name',
         many=True)
-    category = serializers.HyperlinkedRelatedField(
-        queryset=BootcampCategory.objects.all(),
-        view_name='bootcampcategory-detail',
-        lookup_field='slug' 
-    )
+
     class Meta:
         model = Bootcamp
-        fields = ["instructor", "title", "price", "capacity", "category", 
-                "description", "start_date", "end_date", "created_at", "hours", "days", "slug", "url"]
-        read_only_fields = ['slug', 'status']
-        extra_kwargs = { 'url': {'view_name': 'bootcamp-detail', 'lookup_field': 'slug'}}
+        fields = ["instructor", "title", "price", "capacity", "category", "status",
+        "description", "start_date", "end_date", "created_at", "hours", "days", "slug"]
+        read_only_fields = ['slug', 'status',"created_at"]
+        
 
 
 
