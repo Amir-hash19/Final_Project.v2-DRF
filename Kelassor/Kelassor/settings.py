@@ -23,6 +23,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django_celery_beat',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -172,6 +173,8 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 
 
+CELERY_TIMEZONE = 'Asia/Tehran'  # یا هر تایم‌زون مورد نظر
+CELERY_ENABLE_UTC = False
 
 
 

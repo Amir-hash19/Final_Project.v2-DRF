@@ -1,9 +1,12 @@
+from celery.exceptions import MaxRetriesExceededError 
+from kavenegar import KavenegarAPI, APIException 
+from django.core.cache import cache
+from django.utils import timezone
 from django.conf import settings
+from .models import CustomUser
 from celery import shared_task
 import random 
 import redis
-from django.core.cache import cache
-from kavenegar import KavenegarAPI
 import os
 
 
@@ -59,4 +62,28 @@ def send_otp_task(self, phone):
 
 
 
-        
+
+
+
+
+
+@shared_task(bind=True,  max_retries=4, default_retry_delay=60, ignore_result=True)
+def send_birthday_sms(self):
+    today = timezone.now().date()
+    users = CustomUser.objects.filter(birthday__month=today.month, birthday__day=today.day)
+    
+    api_key = os.getenv('KAVENEGAR_API_KEY') 
+
+    for user in users:
+        try:
+            api.sms_send({
+                "receptor":user.phone,
+                "message":f"{user.first_name} Happy Birthday all the best for you",
+                "sender":"2000660110",
+            })
+        except APIException as e:
+            print(f"Error sending to {user.phone}: {str(e)}")    
+            try:
+                self.retry(exc=e)
+            except MaxRetriesExceededError:
+                print(f"[Retry Failed] Could not send to {user.phone} after max retries.")
