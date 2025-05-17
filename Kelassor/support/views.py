@@ -80,7 +80,8 @@ class CreateTicketMessageView(CreateAPIView):
         if ticket.user != self.request.user:
             raise NotFound("You can only choose your ticket")
 
-        serializer.save(ticket=ticket)
+        serializer.save(ticket=ticket,
+        sender=self.request.user)
 
 
 
