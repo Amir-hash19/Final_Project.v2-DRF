@@ -76,7 +76,7 @@ class AdminDeleteBootCampView(DestroyAPIView):
 
 
 class ListAvailableBootCampViewSet(viewsets.ModelViewSet):
-    queryset = Bootcamp.objects.filter(status="registering")
+    queryset = Bootcamp.objects.filter(status="registering").order_by("-created_at")
     permission_classes = [AllowAny]
     serializer_class = BootcampSerializer
     pagination_class = CustomPagination
