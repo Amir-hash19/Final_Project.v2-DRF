@@ -1,4 +1,4 @@
-from .models import Bootcamp, BootcampRegistration, BootcampCategory
+from .models import Bootcamp, BootcampRegistration, BootcampCategory,ClassNotifications
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group 
@@ -8,6 +8,7 @@ from account.models import CustomUser
 from datetime import date, timedelta ,datetime
 from rest_framework import status
 from django.urls import reverse
+from django.utils import timezone
 import datetime
 import uuid 
 
@@ -201,3 +202,133 @@ class ListBootCampRegistrationViewTest(APITestCase):
     def get_token(self, user):
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
+    
+
+
+
+
+
+
+
+class CheckRegistrationStatusViewTest(APITestCase):
+    def setUp(self):
+        # ساخت گروه و کاربر سوپر یوزر
+        self.group = Group.objects.create(name="SupportPanel")
+        self.superuser = CustomUser.objects.create_user(username="admin@35", email="adminuser8@email.com",
+        is_superuser=True, national_id="8767179875", phone="+989122743221")
+        self.superuser.groups.add(self.group)
+
+        self.user = CustomUser.objects.create_user(username="normaluser", email="normaluser8@email.com"
+        ,national_id="8167179875", phone="+989122743229"                                          )
+
+        # بوتکمپ و ثبت نام
+        self.bootcamp = Bootcamp.objects.create(
+            title="Test Bootcamp",
+            price=100,
+            capacity=10,
+            category=BootcampCategory.objects.create(name="Cat", slug="cat"),
+            description="desc",
+            start_date=timezone.now().date(),
+            end_date=timezone.now().date(),
+            hours=10,
+            days=5,
+            slug="test-bootcamp",
+            status="registering",
+            is_online=True,
+        )
+
+        self.registration = BootcampRegistration.objects.create(
+            slug="test-registration",
+            bootcamp=self.bootcamp,
+            volunteer=self.user,
+            phone_number="123456789",
+            payment_type="online",
+            status="pending",
+        )
+
+        # توکن سوپر یوزر
+        refresh = RefreshToken.for_user(self.superuser)
+        self.token = str(refresh.access_token)
+        self.url = reverse('check-status-registrations', kwargs={'slug': self.registration.slug})
+
+    def test_update_status_success(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        data = {
+            "status": "approved",
+            "admin_status_comment": "Looks good"
+        }
+        response = self.client.patch(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.registration.refresh_from_db()
+        self.assertEqual(self.registration.status, "approved")
+        self.assertEqual(self.registration.admin_status_comment, "Looks good")
+        self.assertEqual(self.registration.reviewed_by, self.superuser)
+        self.assertIsNotNone(self.registration.reviewed_at)
+
+    def test_update_with_extra_fields_fails(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        data = {
+            "status": "approved",
+            "admin_status_comment": "Looks good",
+            "extra_field": "not allowed"
+        }
+        response = self.client.patch(self.url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("extra_field", str(response.data))
+
+    def test_update_without_permission_fails(self):
+        # لاگین با کاربر عادی بدون گروه SupportPanel
+        normal_refresh = RefreshToken.for_user(self.user)
+        normal_token = str(normal_refresh.access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {normal_token}')
+        data = {
+            "status": "approved",
+            "admin_status_comment": "Looks good"
+        }
+        response = self.client.patch(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+
+
+
+
+class MassNotificationViewTest(APITestCase):
+    def setUp(self):
+        # کاربر با گروه های لازم
+        self.user = CustomUser.objects.create_user(username="admin#$", email="adminuser@email.com",
+        national_id="9865123281", phone="+989356542131", slug="admin-testuser1")
+        self.user.groups.add(Group.objects.get_or_create(name="SuperUser")[0])
+
+        # توکن JWT
+        refresh = RefreshToken.for_user(self.user)
+        self.token = str(refresh.access_token)
+
+        self.url = reverse('create-notify-by-admin')  # فرض بر این که آدرس url را درست تنظیم کردی
+
+        self.valid_data = {
+            "title": "Important Update",
+            "message": "This is a test notification",
+            "recipients": [self.user.id],  # یا هر شناسه‌ای که تو serializer نیاز داری
+        }
+
+    # def test_create_notifications_success(self):
+    #     self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.token}')
+    #     response = self.client.post(self.url, self.valid_data, format='json')
+    #     self.assertEqual(response.status_code, 201)
+    #     self.assertIn("create-notify-by-admin", response.data["detail"])
+
+    def test_create_notifications_without_auth(self):
+        response = self.client.post(self.url, self.valid_data, format='json')
+        self.assertIn(response.status_code, [401, 403])
+
+    def test_create_notifications_invalid_data(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        invalid_data = {
+            "title": "",  # فرض کنیم عنوان نباید خالی باشه
+            "message": "This is a test notification",
+            "recipients": []
+        }
+        response = self.client.post(self.url, invalid_data, format='json')
+        self.assertEqual(response.status_code, 400)
+
