@@ -78,3 +78,98 @@ class CreateInvoiceViewAPITest(APITestCase):
 
 
 
+
+
+
+class CreatePaymentViewAPITest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="payeruser@12",email="payeruser12@email.com",
+        national_id="8769053412", phone="+989191278865", slug="payer-test")
+
+        self.invoice = Invoice.objects.create(
+            client=self.user,
+            amount=1000.00,
+            deadline=date.today() + timedelta(days=10),
+            description="Test invoice",
+            slug="test-invoice"
+        )
+
+
+        self.url = reverse("create-payment", kwargs={"slug": self.invoice.slug}) 
+
+
+        self.token = str(RefreshToken.for_user(self.user).access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        
+        self.payload = {
+            "method":"online",
+            "amount": "500.00",
+        }
+
+
+    def test_create_valid_online_payment(self):
+        response = self.client.post(self.url, self.payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Payment.objects.count(), 1)
+        payment = Payment.objects.first()
+        self.assertEqual(str(payment.amount), "500.00")
+        self.assertEqual(payment.invoice, self.invoice)
+        self.assertEqual(payment.user, self.user)
+
+
+
+
+
+class DetailPaymentViewTest(APITestCase):
+
+    def setUp(self):
+        self.user1 = User.objects.create_user(username="testuser@15",email="payeruser15@email.com",
+        national_id="8769053419", phone="+989191278875", slug="user1-test"
+        )
+
+        self.user2 = User.objects.create_user(username="testuser@17",email="payeruser17@email.com",
+        national_id="8769053429", phone="+989191278878", slug="user2-test"
+        )
+
+
+        self.invoice1 = Invoice.objects.create(
+            client=self.user1,
+            amount=1000,
+            deadline=date.today() + timedelta(days=10),
+            description="Invoice for user1",
+            slug="invoice-user1"
+        )
+
+        self.payment = Payment.objects.create(
+            user=self.user1,
+            invoice=self.invoice1,
+            amount=500,
+            method="online",
+            slug="payment-user2"
+        )
+
+        self.url = reverse("detail-payment-user", kwargs={"slug": self.payment.slug}) 
+
+    def get_token(self, user):
+        return str(RefreshToken.for_user(user).access_token)
+    
+
+    def test_get_payment_detail_authenticated_owner(self):
+        token = self.get_token(self.user1)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["slug"], self.payment.slug)
+
+
+    def test_get_payment_detail_authenticated_not_owner(self):
+        token = self.get_token(self.user2)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+
+    def test_get_payment_detail_unauthenticated(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
