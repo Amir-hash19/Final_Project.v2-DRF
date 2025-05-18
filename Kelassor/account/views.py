@@ -6,14 +6,14 @@ from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import Group
 from .models import CustomUser, AdminActivityLog
 from .serializers import (CreateAccountSerializer, EditAccountSerializer, CustomAccountSerializer,
-                           SupportPanelSerializer, OTPSerializer, VerifyOTPSerializer, PromoteUserSerializer, 
-                           GroupSerializer, AdminActivityLogSerializer)
+SupportPanelSerializer, OTPSerializer, VerifyOTPSerializer, PromoteUserSerializer, GroupPermissionSerializer,
+AdminActivityLogSerializer)
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .permissions import GroupPermission, is_supportpanel_user
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import viewsets
 from django.contrib.auth import get_user_model
@@ -31,14 +31,34 @@ class CustomPagination(PageNumberPagination):
     page_size = 20
 
 
-
-class CreateGroupViewSet(viewsets.ModelViewSet):
+class CreateGroupWithPermissions(APIView):
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser")]
-    serializer_class = GroupSerializer
-    queryset = Group.objects.all()
 
-    def perform_create(self, serializer):
-        serializer.save()
+    def post(self, request):
+        serializer = GroupPermissionSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        group_name = serializer.validated_data['group_name']
+        permission_codenames = serializer.validated_data['permissions']
+
+        if Group.objects.filter(name=group_name).exists():
+            return Response({'error': 'Group already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        group = Group.objects.create(name=group_name)
+
+        permissions = Permission.objects.filter(codename__in=permission_codenames)
+        if not permissions.exists():
+            return Response({'error': 'No valid permissions found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        group.permissions.set(permissions)
+
+        return Response({
+            'message': f'Group "{group_name}" created with {permissions.count()} permissions.'
+        }, status=status.HTTP_201_CREATED)
+
+
+
 
 
 

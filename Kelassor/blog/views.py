@@ -1,6 +1,6 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from account.permissions import GroupPermission
+from account.permissions import GroupPermission, GroupHasDynamicPermission
 from rest_framework.views import APIView
 from .serializers import BlogCategorySerializer, UploadBlogSerializer, BlogSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -30,12 +30,20 @@ class AddCategoryBlogView(CreateAPIView):
 class UploadBlogView(CreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = UploadBlogSerializer
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+   
 
     def perform_create(self, serializer):
         serializer.save(
             uploaded_by = self.request.user
         )
+
+    def get_permissions_classes(self):
+        required_perms = ["blog.add_blog"]
+        return [
+            IsAuthenticated,
+            GroupPermission("SuperUser", "SupportPanel"),
+            lambda: GroupHasDynamicPermission(required_perms)
+        ]    
 
 
 
@@ -64,11 +72,20 @@ class ListCateogryBlogView(ListAPIView):
 
 
 class EditBlogView(UploadBlogView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = UploadBlogSerializer
 
     def get_queryset(self):
         return Blog.objects.filter(uploaded_by=self.request.user)
+    
+
+    def get_permissions_classes(self):
+        required_perms = ["blog.change_blog"]
+        return [
+            IsAuthenticated,
+            GroupPermission("SuperUser", "SupportPanel"),
+            lambda: GroupHasDynamicPermission(required_perms)
+        ]
+        
 
 
 

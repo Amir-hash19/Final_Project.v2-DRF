@@ -87,3 +87,6 @@ def send_birthday_sms(self):
                 self.retry(exc=e)
             except MaxRetriesExceededError:
                 print(f"[Retry Failed] Could not send to {user.phone} after max retries.")
+
+
+                
