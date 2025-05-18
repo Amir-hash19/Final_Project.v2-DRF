@@ -87,12 +87,6 @@ class SupportPanelSerializer(ModelSerializer):
 
 
 
-class GroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Group
-        fields = ["id","name"]
-
-
 
 
 class OTPSerializer(serializers.Serializer):
@@ -114,7 +108,7 @@ class VerifyOTPSerializer(serializers.Serializer):
 
 class PromoteUserSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
-    group_name = serializers.ChoiceField(choices=["SuperUser", "SupportPanel"])
+    group_name = serializers.CharField()
 
 
     def validate_email(self, value):
@@ -131,3 +125,14 @@ class AdminActivityLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminActivityLog
         fields = "__all__"
+
+
+
+
+class GroupPermissionSerializer(serializers.Serializer):
+    group_name = serializers.CharField(max_length=150)
+    permissions = serializers.ListField(
+        child=serializers.CharField(max_length=100),
+        allow_empty=False
+    )
+

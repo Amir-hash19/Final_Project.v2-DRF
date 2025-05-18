@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, m2m_changed
+from django.db.models.signals import post_save, m2m_changed, pre_save
 from django.utils.timezone import now
 from .permissions import is_supportpanel_user
 from django.dispatch import receiver
@@ -24,7 +24,7 @@ def send_welcome_message(sender, created, instance, **kwargs):
 
 
 
-@receiver(post_save, sender=CustomUser)
+@receiver(pre_save, sender=CustomUser)
 def generate_slug_customeuser(sender, instance, **kwargs):
     if not instance.slug:
         base_slug = slugify(instance.username)

@@ -1,6 +1,6 @@
 from .models import Payment, Invoice, Transaction
 from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView, UpdateAPIView, RetrieveAPIView
-from account.permissions import GroupPermission
+from account.permissions import GroupPermission, GroupHasDynamicPermission
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status 
 from account.views import CustomPagination
@@ -126,10 +126,16 @@ class ListTransactionView(ListAPIView):
 
 
 class EditInvoicesView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SuperUser", "SupportPanel")]
     queryset = Invoice.objects.all()
     serializer_class = InvoiceUpdateSerializer
     lookup_field = 'slug'
+
+    def get_permission_classes(self):
+        required_perms = ["invoices.change_invoice"]
+        return [
+            IsAuthenticated,
+            lambda: GroupHasDynamicPermission(required_perms)
+        ]
 
 
 

@@ -18,3 +18,36 @@ def GroupPermission(*group_names):
 
 def is_supportpanel_user(user):
     return user.groups.filter(name="SupportPanel").exists()
+
+
+
+
+
+class GroupHasDynamicPermission(BasePermission):
+    def __init__(self, required_perms):
+        self.required_perms = required_perms
+        self.always_allowed = ["SuperUser", "SupporPanel"]
+
+
+
+    def has_permission(self, request, view):
+        user = request.user
+        if not user or not user.is_authenticated:
+            return False
+
+        user_groups = user.groups.all()
+
+        if user_groups.filter(name__in=self.always_allowed).exists():
+            return True
+        
+        for group in user_groups:
+            perms = group.permissions.value_list("content_type__app_label", "codename")
+            full_perms = [f"{app}.{code}" for app, code in perms]
+            if all(p in full_perms for p in self.required_perms):
+                return True
+
+
+        return False
+        
+        
+            
