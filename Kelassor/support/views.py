@@ -1,7 +1,7 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import (TicketSerializer ,TicketMessageCreateSerializer, TicketMessageSerializer, 
-                                            AdminEditableTicketMessageSerializer, TicketMessageCreateSerializer)
+AdminEditableTicketMessageSerializer, TicketMessageCreateSerializer)
 from account.permissions import GroupPermission
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from .models import Ticket, TicketMessage
 from account.views import CustomPagination
+from django.http import Http404
 from rest_framework.exceptions import ValidationError
 from rest_framework import status, serializers
 from rest_framework.response import Response
@@ -21,26 +22,33 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 
-
+#test passed
 class CreateTickectView(CreateAPIView):
     # queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     permission_classes = [IsAuthenticated]
+    def perform_create(self, serializer):
+        serializer.save(
+            user=self.request.user
+        )
     def get_queryset(self):
         with transaction.atomic():
             return Ticket.objects.all()
 
 
-
+#test passed
 class DeleteTicketView(DestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TicketSerializer
+    lookup_field = 'slug'
     
     def get_object(self):
-        return self.request.user
+        return get_object_or_404(Ticket,
+        slug=self.kwargs["slug"], user=self.request.user)
 
 
 
+#test passed
 class ListTicketView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TicketSerializer
@@ -50,12 +58,12 @@ class ListTicketView(ListAPIView):
     filterset_fields = ["created_at", "status"]
     ordering_fields = ["-created_at"]
     def get_queryset(self):   
-        return Ticket.objects.filter(user=self.request.user)
+        return Ticket.objects.filter(user=self.request.user).order_by("-create_at")
     
         
 
 
-
+#test passed
 class EditTicketView(UpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TicketSerializer
@@ -66,7 +74,7 @@ class EditTicketView(UpdateAPIView):
 
         
 
-
+#test passed
 class CreateTicketMessageView(CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TicketMessageSerializer
@@ -88,9 +96,9 @@ class CreateTicketMessageView(CreateAPIView):
 
 
 
-
+#test passed
 class ListTicketMessageView(ListAPIView):
-    queryset = TicketMessage.objects.all()
+    queryset = TicketMessage.objects.all().order_by("-created_at")
     serializer_class = TicketMessageCreateSerializer
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -102,18 +110,24 @@ class ListTicketMessageView(ListAPIView):
 
 
         
-
+#test passed
 class AdminResponseMessageView(UpdateAPIView):
     queryset = TicketMessage.objects.all()
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = AdminEditableTicketMessageSerializer
     lookup_field = 'slug'
+    def perform_update(self, serializer):
+        return serializer.save(
+            admin=self.request.user
+        )
+    
+  
 
 
         
 
 
-
+#test passed
 class AdminDetailMessageView(RetrieveAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     queryset = TicketMessage.objects.all()

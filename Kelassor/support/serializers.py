@@ -16,14 +16,8 @@ class TicketSerializer(serializers.ModelSerializer):
         fields = ['title', 'description', 'bootcamp', 'user']
         read_only_fields = ['status', 'slug', 'user'] 
 
-    def create(self, validated_data):
-        with transaction.atomic():
-            user = self.context['request'].user
-            title = validated_data.get('title', '')
-            slug = slugify(title) + "-" + str(uuid.uuid4())[:8]  # یکتا و خوانا
-            validated_data['slug'] = slug
-            ticket = Ticket.objects.create(user=user, **validated_data)
-            return ticket
+ 
+         
 
 
 
@@ -31,6 +25,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
 class TicketMessageCreateSerializer(serializers.ModelSerializer):
     ticket = TicketSerializer(read_only=True)
+    sender = serializers.StringRelatedField()
 
     class Meta:
         model = TicketMessage
@@ -87,6 +82,3 @@ class AdminEditableTicketMessageSerializer(serializers.ModelSerializer):
 
 
 
-    def update(self, instance, validated_data):
-        validated_data['admin'] = self.context['request'].user
-        return super().update(instance, validated_data)

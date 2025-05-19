@@ -1,6 +1,6 @@
 from django.urls import path, include
 from .views import (CreateTickectView, DeleteTicketView, ListTicketView, EditTicketView, CreateTicketMessageView,
-                     CreateTicketMessageView, AdminResponseMessageView, AdminDetailMessageView)
+CreateTicketMessageView, AdminResponseMessageView, AdminDetailMessageView)
 from rest_framework.routers import DefaultRouter
 from .views import  ListTicketMessageView
 
