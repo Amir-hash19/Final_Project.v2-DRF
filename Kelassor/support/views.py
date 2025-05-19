@@ -13,7 +13,6 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import status, serializers
 from rest_framework.response import Response
 from django.db import transaction
-from django.db import transaction
 from rest_framework.exceptions import NotFound
 from bootcamp.models import Bootcamp, BootcampRegistration
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -24,9 +23,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 class CreateTickectView(CreateAPIView):
-    queryset = Ticket.objects.all()
+    # queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        with transaction.atomic():
+            return Ticket.objects.all()
 
 
 
@@ -70,7 +72,8 @@ class CreateTicketMessageView(CreateAPIView):
     serializer_class = TicketMessageSerializer
     
     def perform_create(self, serializer):
-        ticket_slug = self.kwargs.get('slug')
+        with transaction.atomic():
+            ticket_slug = self.kwargs.get('slug')
 
         try:
             ticket = Ticket.objects.get(slug=ticket_slug)
