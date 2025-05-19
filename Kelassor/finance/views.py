@@ -23,8 +23,11 @@ from django.db.models import Count
 
 class CreateInvoiceView(CreateAPIView):
     permission_classes = [IsAuthenticated ,GroupPermission("SupportPanel", "SuperUser")]
-    queryset = Invoice.objects.all()
+    # queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
+    def get_queryset(self):
+        with transaction.atomic():
+            return Invoice.objects.all()
 
 
 

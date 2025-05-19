@@ -8,6 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
 from rest_framework.response import Response
 from .models import CategoryBlog, Blog
+from django.db import transaction
 from account.views import CustomPagination
 from .filters import CategoryBlogFilter
 
@@ -33,8 +34,10 @@ class UploadBlogView(CreateAPIView):
    
 
     def perform_create(self, serializer):
-        serializer.save(
-            uploaded_by = self.request.user
+        with transaction.atomic():
+
+            serializer.save(
+                uploaded_by = self.request.user
         )
 
     def get_permissions_classes(self):

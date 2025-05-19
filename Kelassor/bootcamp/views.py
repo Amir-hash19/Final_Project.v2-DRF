@@ -8,8 +8,8 @@ from rest_framework import viewsets
 from .models import BootcampCategory, Bootcamp, BootcampRegistration, SMSLog
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from .serializers import (BootcampSerializer,CategoryBootcampSerializer, BootcampCountSerializer,BootcampCategorySerializer,BootcampRegistrationCreateSerializer,
-                                        AdminBootcampRegistrationSerializer, BootCampRegitrationSerializer, BootcampStudentSerializer,
-                                        SMSLogSerializer, MassNotificationSerializer)
+AdminBootcampRegistrationSerializer, BootCampRegitrationSerializer, BootcampStudentSerializer,
+SMSLogSerializer, MassNotificationSerializer)
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
@@ -17,13 +17,17 @@ from rest_framework.exceptions import NotFound
 from django.db.models import Count
 from django.utils import timezone
 from django.http import Http404
+from django.db import transaction
 
 
 
 class AdminCreateBootcampView(CreateAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = BootcampSerializer
-    queryset = Bootcamp.objects.all()
+    def get_queryset(self):
+        with transaction.atomic():
+            return Bootcamp.objects.all
+
 
 
 
@@ -145,7 +149,7 @@ class DetailBootCampView(RetrieveAPIView):
 
 class MostRequestedBootCampView(ListAPIView):
     serializer_class = BootcampCountSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return 
@@ -240,10 +244,11 @@ class MassNotificationView(APIView):
 
 
     def post(self, request):
-        serializer = MassNotificationSerializer(data=request.data)
-        if serializer.is_valid():
-            notifications = serializer.save()
-            return Response({
-                "detail": f"{len(notifications)} notifications created and are being sent."
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            with transaction.atomic():
+                serializer = MassNotificationSerializer(data=request.data)
+                if serializer.is_valid():
+                    notifications = serializer.save()
+                return Response({
+                    "detail": f"{len(notifications)} notifications created and are being sent."
+                    }, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
