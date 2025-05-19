@@ -13,14 +13,14 @@ from rest_framework.exceptions import ValidationError
 from account.models import CustomUser
 from django.db.models import Sum
 from .serializers import (InvoiceSerializer, BasicUserSerializer, PaymentSerializer, TransactionSerializer, 
-                          InvoiceUpdateSerializer)
+InvoiceUpdateSerializer, DetailTransactionSerializer)
 from django.db.models import Count
 
 
 
 
 
-
+#test passed
 class CreateInvoiceView(CreateAPIView):
     permission_classes = [IsAuthenticated ,GroupPermission("SupportPanel", "SuperUser")]
     # queryset = Invoice.objects.all()
@@ -32,18 +32,22 @@ class CreateInvoiceView(CreateAPIView):
 
 
 
-
+#test passed
 class ListUserWithInvoiceView(ListAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = BasicUserSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     pagination_class = CustomPagination
+    search_fields = ["username", "email", "phone"]
+    filterset_fields = ["gander", "date_added"]
+    ordering_fields = ["-date_added"]
+
 
     def get_queryset(self):
-        return  CustomUser.objects.annotate(invoice_count=Count('invoice')).filter(invoice_count__gt=0)
+        return CustomUser.objects.annotate(invoice_count=Count('invoice')).filter(invoice_count__gt=0).order_by("-date_joined")
 
 
-
+#test passed
 class DeleteInvoiceView(DestroyAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     queryset = Invoice.objects.all()
@@ -51,7 +55,7 @@ class DeleteInvoiceView(DestroyAPIView):
     lookup_field = 'slug'   
 
 
-
+#test passed
 class CreatePaymentView(CreateAPIView):
     queryset = Payment.objects.all()
     permission_classes = [IsAuthenticated]
@@ -91,15 +95,19 @@ class CreatePaymentView(CreateAPIView):
 
 
 
-
+#test passed
 class AdminListPaymentView(ListAPIView):
-    queryset = Payment.objects.all()
+    queryset = Payment.objects.all().order_by("-paid_at")
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = PaymentSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["user__username", "invoice", "paid_at"]
+    filterset_fields = ["is_verified", "method"]
+    ordering_fields = ["paid_at"]
 
     
 
-
+#test passed
 class ListPaymentView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PaymentSerializer
@@ -110,10 +118,10 @@ class ListPaymentView(ListAPIView):
     pagination_class = CustomPagination
     
     def get_queryset(self):
-        return Payment.objects.filter(user=self.request.user)
+        return Payment.objects.filter(user=self.request.user).order_by("-paid_at")
     
 
-
+#test passed
 class ListTransactionView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TransactionSerializer
@@ -124,10 +132,10 @@ class ListTransactionView(ListAPIView):
     pagination_class = CustomPagination
     
     def get_queryset(self):
-        return Transaction.objects.filter(user=self.request.user)
+        return Transaction.objects.filter(user=self.request.user).order_by("-transaction_date")
     
 
-
+#test passed
 class EditInvoicesView(UpdateAPIView):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceUpdateSerializer
@@ -143,7 +151,7 @@ class EditInvoicesView(UpdateAPIView):
 
 
 
-
+#test passed
 class ListInvoiceUserView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = InvoiceUpdateSerializer
@@ -159,19 +167,7 @@ class ListInvoiceUserView(ListAPIView):
     
 
 
-
-
-class DetailPaymentView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = PaymentSerializer
-    lookup_field = 'slug'
-
-    def get_queryset(self):
-        return Payment.objects.filter(user=self.request.user)
-
-
-
-
+#test passed
 class DetailInvoiceView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = InvoiceSerializer
@@ -181,15 +177,23 @@ class DetailInvoiceView(RetrieveAPIView):
         return Invoice.objects.select_related('client').filter(client=self.request.user)
     
 
-
+#test passed
 class DetailTransactionView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = InvoiceSerializer
+    serializer_class = DetailTransactionSerializer
     lookup_field = 'slug'
 
     def get_queryset(self):
-        return Invoice.objects.filter(client=self.request.user)
+        return Transaction.objects.filter(user=self.request.user)
 
 
 
 
+#test passed
+class DetailPaymentView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PaymentSerializer
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        return Payment.objects.filter(user=self.request.user)

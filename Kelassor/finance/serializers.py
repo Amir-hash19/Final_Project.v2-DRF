@@ -32,6 +32,7 @@ class BasicUserSerializer(serializers.ModelSerializer):
 
 class PaymentSerializer(ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
+    invoice = serializers.StringRelatedField()
     class Meta:
         model = Payment
         fields = "__all__"
@@ -64,6 +65,7 @@ class TransactionSerializer(ModelSerializer):
 
 
 class InvoiceUpdateSerializer(ModelSerializer):
+    client = serializers.StringRelatedField()
     class Meta:
         model = Invoice
         fields = "__all__"
@@ -77,3 +79,13 @@ class InvoiceUpdateSerializer(ModelSerializer):
 
         instance.save()
         return instance    
+    
+
+
+
+
+class DetailTransactionSerializer(ModelSerializer):
+    user = serializers.StringRelatedField()
+    class Meta:
+        model = Transaction
+        fields = "__all__"
