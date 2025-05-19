@@ -5,7 +5,7 @@ from account.models import CustomUser
 
 
 class CategoryBlog(models.Model):
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, unique=True)
     slug = models.SlugField(unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
 

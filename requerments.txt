@@ -9,5 +9,5 @@ kavenegar
 python-decouple
 djangorestframework-simplejwt
 django-redis
-
+django-celery-beat
 django-anymail

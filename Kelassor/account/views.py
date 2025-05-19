@@ -61,7 +61,7 @@ class CreateGroupWithPermissions(APIView):
 
 
 
-
+#test passed
 #ساختن اکانت عادی برای کاربر نرمال 
 class RegisterAccountView(APIView):
     permission_classes = [AllowAny]
@@ -83,7 +83,7 @@ class RegisterAccountView(APIView):
 
 
 
-
+#test passed
 #ویرایش اکانت برای کاربر عادی
 class EditAccountView(UpdateAPIView):
     permission_classes = [IsAuthenticated]
@@ -136,7 +136,7 @@ class DeleteAccountView(DestroyAPIView):
     
 
 
-
+#test passed
 class DetailAccountView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CustomAccountSerializer
@@ -148,9 +148,9 @@ class DetailAccountView(RetrieveAPIView):
 
 
 
-
+#test passed
 class ListSupportAccountView(ListAPIView):
-    queryset = CustomUser.objects.filter(groups__name__in=["SupportPanel"])
+    queryset = CustomUser.objects.filter(groups__name__in=["SupportPanel"]).order_by("-date_joined")
     permission_classes = [IsAuthenticated,GroupPermission("SupportPanel", "SuperUser")]
     serializer_class = SupportPanelSerializer
     pagination_class = CustomPagination
@@ -294,17 +294,19 @@ class PromoteUserView(APIView):
         
 
 
-
+#tast passed
 class DeleteSupportPanelView(DestroyAPIView):
     queryset = CustomUser.objects.all()
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser")]
     serializer_class = SupportPanelSerializer
-
+    lookup_field = 'slug'
 
     def perform_destroy(self, instance):
         if self.request.user == instance:
             raise ValidationError("You Cannot Delete your own account from here!")
         
+
+
 
 class AdminLogOutView(APIView):
     permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
@@ -323,13 +325,13 @@ class AdminLogOutView(APIView):
 
 
 
-
+#test passed
 class ListAdminActivityLogView(ListAPIView):
     serializer_class = AdminActivityLogSerializer
-    permission_classes = [IsAuthenticated, GroupPermission("SupperUser")]
+    permission_classes = [IsAuthenticated, GroupPermission("SuperUser")]
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    search_fields = ["action", "detail", "user__username", "user__phone"]
+    search_fields = ["action", "detail", "admin_user__username", "admin_user__phone"]
     filterset_fields = ["created_at"]
     ordering_fields = ["-created_at"]
 
@@ -339,6 +341,6 @@ class ListAdminActivityLogView(ListAPIView):
         last_72_hours = now() - timedelta(hours=72)
 
         return AdminActivityLog.objects.filter(
-            user__groups__name="SupportPanel",
+            admin_user__groups__name="SupportPanel",
             created_at__gte=last_72_hours
-        )
+        ).order_by("-created_at")

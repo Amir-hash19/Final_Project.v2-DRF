@@ -9,7 +9,7 @@ class CustomeUserAdmin(admin.ModelAdmin):
     ordering = ("-date_joined", )
     search_fields = ("username", "email", "phone")
     list_per_page = 20
-    fields = (("first_name", "last_name", "email", "phone" , "username"),
+    fields = (("first_name", "last_name", "email", "phone" , "username", "slug"),
             "about_me", "national_id", "birthday", "password", "gender", "is_staff", "is_active", "is_superuser" , "groups")
 
 

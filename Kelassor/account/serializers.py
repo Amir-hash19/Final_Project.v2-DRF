@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from phonenumber_field.serializerfields import PhoneNumberField
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from rest_framework import serializers
 from django.db import IntegrityError
 from django.db import transaction
@@ -67,7 +67,9 @@ class CustomAccountSerializer(ModelSerializer):
   
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ["username", "first_name", "last_name",
+        "phone", "email", "about_me", "birthday", "gender", "national_id","date_joined", "groups","last_login"]
+        read_only_fields = ["is_active", "is_superuser", "is_staff", "slug", "id", "groups"]
 
     def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
@@ -80,7 +82,17 @@ class CustomAccountSerializer(ModelSerializer):
 
 
 
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ['name', 'codename']
+
+
+
+
 class SupportPanelSerializer(ModelSerializer):
+    groups = serializers.StringRelatedField(many=True)
+    user_permissions = PermissionSerializer(many=True)
     class Meta:
         model = User
         fields = "__all__"
@@ -122,6 +134,7 @@ class PromoteUserSerializer(serializers.Serializer):
  
 
 class AdminActivityLogSerializer(serializers.ModelSerializer):
+    admin_user = serializers.StringRelatedField()
     class Meta:
         model = AdminActivityLog
         fields = "__all__"
