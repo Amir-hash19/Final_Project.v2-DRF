@@ -9,21 +9,33 @@ from .models import Blog, CategoryBlog
 class BlogCategorySerializer(ModelSerializer):
     class Meta:
         model = CategoryBlog
-        fields = "__all__"
+        fields = ["name"]
+        
 
 
 
 
 class UploadBlogSerializer(serializers.ModelSerializer):
+    blogcategory = serializers.SlugRelatedField(
+        slug_field = "name",
+        queryset=CategoryBlog.objects.all()
+    )
+    uploaded_by = serializers.StringRelatedField()
     class Meta:
         model = Blog
-        fields = ['title', 'content',  'blogcategory', 'uploaded_by']
+        fields = ['title', 'content',  'blogcategory', 'uploaded_by', "file", "date_added"]
         read_only_fields = ['uploaded_by', 'slug'] 
 
 
 
 
-class BlogSerializer(ModelSerializer):
-    model = Blog
-    fields = "__all__"
-        
+class BlogSerializer(serializers.ModelSerializer):
+    blogcategory = serializers.SlugRelatedField(
+        slug_field='name',
+        queryset=CategoryBlog.objects.all() 
+    )
+    uploaded_by = serializers.StringRelatedField()
+
+    class Meta:
+        model = Blog
+        fields = "__all__"
