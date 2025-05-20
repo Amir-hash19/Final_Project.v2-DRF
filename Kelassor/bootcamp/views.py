@@ -2,7 +2,7 @@ from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, D
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from account.permissions import GroupPermission
+from account.permissions import GroupPermission, create_permission_class
 from account.views import CustomPagination
 from rest_framework import viewsets
 from .models import BootcampCategory, Bootcamp, BootcampRegistration, SMSLog
@@ -20,37 +20,37 @@ from django.http import Http404
 from django.db import transaction
 
 
-
+#test passed
 class AdminCreateBootcampView(CreateAPIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.add_bootcamp"])]
     serializer_class = BootcampSerializer
     def get_queryset(self):
         with transaction.atomic():
-            return Bootcamp.objects.all
+            return Bootcamp.objects.all()
 
 
 
 
-
+#test passed
 class AdminCreateCategoryView(CreateAPIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.add_bootcampcategory"])]
     serializer_class = CategoryBootcampSerializer
     queryset = BootcampCategory.objects.all()
     
 
 
-
+#test passed
 class AdminEditCategoryView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.change_bootcampcategory"])]
     serializer_class = CategoryBootcampSerializer
     queryset = BootcampCategory.objects.all()
     lookup_field = 'slug'
     
 
 
-
+#test passed
 class AdminDeleteCategoryView(DestroyAPIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.delete_bootcampcategory"])]
     serializer_class = CategoryBootcampSerializer
     queryset = BootcampCategory.objects.all()
     lookup_field = 'slug'
@@ -58,9 +58,9 @@ class AdminDeleteCategoryView(DestroyAPIView):
 
 
 
-
+#test passed
 class AdminEditBootCampView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel","SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.change_bootcamp"])]
     serializer_class = BootcampSerializer
     queryset = Bootcamp.objects.all()
     lookup_field = 'slug'
@@ -68,9 +68,9 @@ class AdminEditBootCampView(UpdateAPIView):
 
 
 
-
+#test passed
 class AdminDeleteBootCampView(DestroyAPIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel","SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.delete_bootcamp"])]
     serializer_class = BootcampSerializer
     queryset = Bootcamp.objects.all()
     lookup_field = 'slug'
@@ -78,7 +78,7 @@ class AdminDeleteBootCampView(DestroyAPIView):
 
 
 
-
+#test passed
 class ListAvailableBootCampViewSet(viewsets.ModelViewSet):
     queryset = Bootcamp.objects.filter(status="registering").order_by("-created_at")
     permission_classes = [AllowAny]
@@ -87,11 +87,11 @@ class ListAvailableBootCampViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["title", "category", "created_at"]
     filterset_fields = ["is_online", "price"]
-    ordering_fields = ["-created_at"]
+    ordering_fields = ["created_at"]
     lookup_field = 'slug'
 
 
-
+#test passed
 class BootcampCategoryViewSet(viewsets.ModelViewSet):
     queryset = BootcampCategory.objects.all()
     serializer_class = BootcampCategorySerializer
@@ -101,33 +101,34 @@ class BootcampCategoryViewSet(viewsets.ModelViewSet):
 
 
 
-
+#test passed
 class ListCategoryBootcampView(ListAPIView):
-    queryset = BootcampCategory.objects.all()
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    queryset = BootcampCategory.objects.all().order_by("-date_created")
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.view_bootcampcategory"])]
     serializer_class = CategoryBootcampSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["name"]
     filterset_fields = ["date_created"]
-    ordering_fields = ["-date_created"]
+    ordering_fields = ["date_created"]
 
 
 
 
 
-
+#test passed
 class AdminListAllBootCampView(ListAPIView):
-    queryset = Bootcamp.objects.all()
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    queryset = Bootcamp.objects.all().order_by("-created_at")
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.view_bootcamp"])]
     serializer_class = BootcampSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["title", "description"]
     filterset_fields = ["status", "is_online", "category", "created_at"]
-    ordering_fields = ["-created_at"]
+    ordering_fields = ["created_at"]
 
 
 
 
+#test passed
 class DetailBootCampView(RetrieveAPIView):
     permission_classes = [AllowAny]
     serializer_class = BootcampSerializer
@@ -140,20 +141,19 @@ class DetailBootCampView(RetrieveAPIView):
         try:
             return super().get_object()    
         except Http404:
-            raise NotFound("Bootcamp nor found !")
+            raise NotFound("Bootcamp not found !")
 
 
 
 
 
-
+#test passed
 class MostRequestedBootCampView(ListAPIView):
     serializer_class = BootcampCountSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.view_bootcamp"])]
 
     def get_queryset(self):
-        return 
-    Bootcamp.objects.annotate(
+        return Bootcamp.objects.annotate(
         request_count=Count("registrations")
     ).order_by("-request_count")[:10]
 
@@ -161,24 +161,24 @@ class MostRequestedBootCampView(ListAPIView):
 
 
 
-
+#test passed
 class ListBootCampRegistrationView(ListAPIView):
     queryset = BootcampRegistration.objects.filter(status='pending').order_by("-registered_at")
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.view_bootcampregistration"])]
     serializer_class = BootCampRegitrationSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["phone_number", "comment"]
     filterset_fields = ["payment_type", "status", "reviewed_by"]
-    ordering_fields = ["-registered_at"]
+    ordering_fields = ["registered_at"]
     
 
 
 
 
 
-
+#test passed
 class CheckRegistraionStatusView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.change_bootcampregistration"])]
     queryset = BootcampRegistration.objects.all()
     serializer_class = AdminBootcampRegistrationSerializer
     lookup_field = 'slug'
@@ -190,7 +190,7 @@ class CheckRegistraionStatusView(UpdateAPIView):
         
 
 
-
+#test passed
 class CreateBootcampRegistrationView(CreateAPIView):
     queryset = BootcampRegistration.objects.all()
     serializer_class = BootcampRegistrationCreateSerializer
@@ -204,9 +204,9 @@ class CreateBootcampRegistrationView(CreateAPIView):
 
 
 
-
+#test passed
 class BootcampApprovedStudentsListView(ListAPIView):#لیست اعضای یه بوت کمپ
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.view_bootcamp"])]
     serializer_class = BootcampStudentSerializer
 
     def get_queryset(self):
@@ -222,14 +222,19 @@ class BootcampApprovedStudentsListView(ListAPIView):#لیست اعضای یه ب
 
 
 
-
+#test passed
 class ListSMSLogView(ListAPIView):
-    queryset = SMSLog.objects.all()
+    queryset = SMSLog.objects.all().order_by("-created_at")
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser", "SupportPanel")]
     serializer_class = SMSLogSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["phone_number", "full_name", "response_message"]
+    filterset_fields = ["status", "created_at"]
+    ordering_fields = ["created_at"]
+    
 
 
-
+#test passed
 class DeleteSMSLogView(DestroyAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser", "SupportPanel")]
     queryset = SMSLog.objects.all()

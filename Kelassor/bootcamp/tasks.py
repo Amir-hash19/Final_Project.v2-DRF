@@ -63,6 +63,8 @@ def send_sms_notification(notification_id):
     except APIException as e:
         notification.status = 'failed'
         notification.save()
+    except ClassNotifications.DoesNotExist:
+        pass  # اگر نوتیفیکیشن پیدا نشد، نادیده بگیر
 
 
 

@@ -4,13 +4,15 @@ from rest_framework import serializers
 from account.models import CustomUser
 
 
+class InstructorSerializer(ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ["email", "first_name", "last_name", "username", "about_me"]
 
 
 class BootcampSerializer(serializers.ModelSerializer):
-    instructor = serializers.SlugRelatedField(
-        queryset=CustomUser.objects.all(),
-        slug_field='last_name',
-        many=True)
+    instructor = InstructorSerializer(many=True, read_only=True)
+    category = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Bootcamp
@@ -18,9 +20,6 @@ class BootcampSerializer(serializers.ModelSerializer):
         "description", "start_date", "end_date", "created_at", "hours", "days", "slug"]
         read_only_fields = ['slug', 'status',"created_at"]
         
-
-
-
 
 
 class CategoryBootcampSerializer(ModelSerializer):
@@ -104,12 +103,17 @@ class BootcampCategorySerializer(serializers.HyperlinkedModelSerializer):
 
 class BootcampRegistrationCreateSerializer(serializers.ModelSerializer):
     volunteer = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    bootcamp = serializers.SlugRelatedField(
+        slug_field = "title",
+        queryset=Bootcamp.objects.all()
+    )
     class Meta:
         model = BootcampRegistration
         fields = [
             'volunteer', 'bootcamp', 'payment_type', 'installment_count',
             'comment', 'phone_number', 'slug'
         ]
+        read_only_fields = ["slug", "volunteer"]
 
     def create(self, validated_data):
         volunteer = validated_data['volunteer']

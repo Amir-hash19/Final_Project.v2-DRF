@@ -1,6 +1,6 @@
 from .models import Payment, Invoice, Transaction
 from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView, UpdateAPIView, RetrieveAPIView
-from account.permissions import GroupPermission, GroupHasDynamicPermission
+from account.permissions import GroupPermission, GroupHasDynamicPermission, create_permission_class
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status 
 from account.views import CustomPagination
@@ -22,7 +22,7 @@ from django.db.models import Count
 
 #test passed
 class CreateInvoiceView(CreateAPIView):
-    permission_classes = [IsAuthenticated ,GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["finance.add_invoice"])]
     # queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
     def get_queryset(self):
@@ -34,7 +34,7 @@ class CreateInvoiceView(CreateAPIView):
 
 #test passed
 class ListUserWithInvoiceView(ListAPIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["finance.view_invoice"])]
     serializer_class = BasicUserSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     pagination_class = CustomPagination
@@ -49,7 +49,7 @@ class ListUserWithInvoiceView(ListAPIView):
 
 #test passed
 class DeleteInvoiceView(DestroyAPIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["finance.delete_invoice"])]
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer     
     lookup_field = 'slug'   
@@ -98,7 +98,7 @@ class CreatePaymentView(CreateAPIView):
 #test passed
 class AdminListPaymentView(ListAPIView):
     queryset = Payment.objects.all().order_by("-paid_at")
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["finance.view_payment"])]
     serializer_class = PaymentSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["user__username", "invoice", "paid_at"]
@@ -137,16 +137,11 @@ class ListTransactionView(ListAPIView):
 
 #test passed
 class EditInvoicesView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, create_permission_class(["finance.change_invoice"])]
     queryset = Invoice.objects.all()
     serializer_class = InvoiceUpdateSerializer
     lookup_field = 'slug'
 
-    def get_permission_classes(self):
-        required_perms = ["invoices.change_invoice"]
-        return [
-            IsAuthenticated,
-            lambda: GroupHasDynamicPermission(required_perms)
-        ]
 
 
 

@@ -35,7 +35,7 @@ class AdminBootcampRegistration(admin.ModelAdmin):
     list_filter = ("status", "payment_type", "installment_count", "volunteer")
     ordering = ("-registered_at", )
     list_per_page = 20
-    fields = (("bootcamp", "volunteer","status", "payment_type", "installment_count", "phone_number"), "comment", "reviewed_at", "reviewed_by", "admin_status_comment")
+    fields = (("bootcamp", "slug", "volunteer","status", "payment_type", "installment_count", "phone_number"), "comment", "reviewed_at", "reviewed_by", "admin_status_comment")
 
 
 
