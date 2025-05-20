@@ -11,7 +11,7 @@ AdminActivityLogSerializer)
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from .permissions import GroupPermission, is_supportpanel_user
+from .permissions import GroupPermission, is_supportpanel_user, create_permission_class
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import Group, Permission
 from rest_framework.pagination import PageNumberPagination
@@ -20,6 +20,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from django.utils.timezone import now, timedelta
+from collections import defaultdict
 from rest_framework import status
 from django.db import transaction
 from .OTPThrottle import OTPThrottle
@@ -56,6 +57,29 @@ class CreateGroupWithPermissions(APIView):
         return Response({
             'message': f'Group "{group_name}" created with {permissions.count()} permissions.'
         }, status=status.HTTP_201_CREATED)
+
+
+
+
+
+class GroupedPermissionListAPI(APIView):
+    permission_classes = [GroupPermission("SuperUser")]
+
+    def get(self, request):
+        basic_perms = ['add', 'change', 'delete', 'view']
+        permissions = Permission.objects.select_related('content_type').all()
+
+        grouped_data = defaultdict(list)
+
+        for perm in permissions:
+            codename = perm.codename
+            if any(codename.startswith(prefix + '_') for prefix in basic_perms):
+                app_label = perm.content_type.app_label
+                grouped_data[app_label].append(codename)
+
+        return Response(grouped_data)        
+
+
 
 
 
@@ -151,7 +175,7 @@ class DetailAccountView(RetrieveAPIView):
 #test passed
 class ListSupportAccountView(ListAPIView):
     queryset = CustomUser.objects.filter(groups__name__in=["SupportPanel"]).order_by("-date_joined")
-    permission_classes = [IsAuthenticated,GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated,create_permission_class(["support.view_customuser"])]
     serializer_class = SupportPanelSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -309,8 +333,7 @@ class DeleteSupportPanelView(DestroyAPIView):
 
 
 class AdminLogOutView(APIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
-
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
             refresh_token = request.data.get('refresh_token')

@@ -2,7 +2,7 @@ from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, R
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import (TicketSerializer ,TicketMessageCreateSerializer, TicketMessageSerializer, 
 AdminEditableTicketMessageSerializer, TicketMessageCreateSerializer)
-from account.permissions import GroupPermission
+from account.permissions import GroupPermission, create_permission_class
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
@@ -26,7 +26,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 class CreateTickectView(CreateAPIView):
     # queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     def perform_create(self, serializer):
         serializer.save(
             user=self.request.user
@@ -76,7 +76,7 @@ class EditTicketView(UpdateAPIView):
 
 #test passed
 class CreateTicketMessageView(CreateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = TicketMessageSerializer
     
     def perform_create(self, serializer):
@@ -100,11 +100,11 @@ class CreateTicketMessageView(CreateAPIView):
 class ListTicketMessageView(ListAPIView):
     queryset = TicketMessage.objects.all().order_by("-created_at")
     serializer_class = TicketMessageCreateSerializer
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["support.view_ticketmessage"])]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["message", "title"]
     filterset_fields = ["created_at", "message_status"]
-    ordering_fields = ["-created_at"]
+    ordering_fields = ["created_at"]
     
 
 
@@ -113,7 +113,7 @@ class ListTicketMessageView(ListAPIView):
 #test passed
 class AdminResponseMessageView(UpdateAPIView):
     queryset = TicketMessage.objects.all()
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["support.change_ticketmessage"])]
     serializer_class = AdminEditableTicketMessageSerializer
     lookup_field = 'slug'
     def perform_update(self, serializer):
@@ -129,7 +129,7 @@ class AdminResponseMessageView(UpdateAPIView):
 
 #test passed
 class AdminDetailMessageView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated, GroupPermission("SupportPanel", "SuperUser")]
+    permission_classes = [IsAuthenticated, create_permission_class(["support.view_ticketmessage"])]
     queryset = TicketMessage.objects.all()
     serializer_class = TicketMessageSerializer
     lookup_field = 'slug'

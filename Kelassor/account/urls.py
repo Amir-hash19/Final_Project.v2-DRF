@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (RegisterAccountView, EditAccountView, LogOutView, DeleteAccountView, DetailAccountView, 
 ListSupportAccountView, ListAdminActivityLogView, SendOTPLogInView, VerifyOTPView, PromoteUserView,
-DeleteSupportPanelView, AdminLogOutView, CreateGroupWithPermissions)
+DeleteSupportPanelView, AdminLogOutView, CreateGroupWithPermissions, GroupedPermissionListAPI)
 from rest_framework_simplejwt.views import TokenRefreshView
 
 
@@ -21,6 +21,7 @@ urlpatterns = [
     path("logout-admin/", AdminLogOutView.as_view(), name="logout-admin-view"),
     path("admin-activity-logs/", ListAdminActivityLogView.as_view(), name="admin-activity-logs"),
     path("groups/create/", CreateGroupWithPermissions.as_view(), name="create-group-by-admin"),
+    path("permissions/lists/", GroupedPermissionListAPI.as_view(), name="list-permissions"),
 
 
 ]    

@@ -10,7 +10,7 @@ import uuid
 
 
 
-@receiver(post_save, sender=Bootcamp)
+@receiver(pre_save, sender=Bootcamp)
 def generate_slug_bootcamp(sender, instance, **kwargs):
     if not instance.slug:
         base_slug = slugify(instance.title)
@@ -20,7 +20,7 @@ def generate_slug_bootcamp(sender, instance, **kwargs):
 
 
 
-@receiver(post_save, sender=BootcampRegistration)
+@receiver(pre_save, sender=BootcampRegistration)
 def generate_slug_registration(sender, instance, **kwargs):
     if not instance.slug:
         date_part = datetime.now().strftime("%Y%m%d")
@@ -30,7 +30,7 @@ def generate_slug_registration(sender, instance, **kwargs):
 
 
 
-@receiver(post_save, sender=BootcampCategory)
+@receiver(pre_save, sender=BootcampCategory)
 def generate_slug_category(sender, instance, **kwargs):
     if not instance.slug:
         base_slug = slugify(instance.name)
