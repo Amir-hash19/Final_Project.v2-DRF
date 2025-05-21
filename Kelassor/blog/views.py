@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from .serializers import BlogCategorySerializer, UploadBlogSerializer, BlogSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from account.utils.logging import log_admin_activity
 from django.http import FileResponse
 from rest_framework.response import Response
 from .models import CategoryBlog, Blog
@@ -23,6 +24,19 @@ class AddCategoryBlogView(CreateAPIView):
     queryset = CategoryBlog.objects.all()
     permission_classes = [IsAuthenticated, create_permission_class(["blog.add_categoryblog"])]
     serializer_class = BlogCategorySerializer
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            category = serializer.save()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="created category for blog",
+                    instance=category.name
+                )
+            except Exception as e:
+                pass    
+        
+        
 
 
 
@@ -36,10 +50,18 @@ class UploadBlogView(CreateAPIView):
 
     def perform_create(self, serializer):
         with transaction.atomic():
+            blog = serializer.save(uploaded_by=self.request.user)
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="Uploaded a new blog",
+                    instance=f"Title:{blog.title}, ID:{blog.id}"
+                )
+            except Exception:
+                pass
 
-            serializer.save(
-                uploaded_by = self.request.user
-        )
+
+
 
 
 
@@ -50,7 +72,18 @@ class DeleteCategoryBlogView(DestroyAPIView):
     permission_classes = [IsAuthenticated, create_permission_class(["blog.delete_categoryblog"])]
     serializer_class = BlogCategorySerializer
     lookup_field = 'slug'
-
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            category_name = instance.name 
+            instance.delete()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="Deleted category blog",
+                    instance=category_name
+                )
+            except Exception:
+                pass
 
 
 
@@ -74,6 +107,17 @@ class EditBlogView(UpdateAPIView):
     permission_classes = [IsAuthenticated, create_permission_class(["blog.change_blog"])]
     queryset = Blog.objects.all()
     lookup_field = 'slug'
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            blog = serializer.save()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="edited blog",
+                   instance=f"Title: {blog.title}, ID: {blog.id}"
+                )
+            except Exception:
+                pass    
 
 
     
@@ -87,6 +131,18 @@ class DeleteBlogView(DestroyAPIView):
     serializer_class = UploadBlogSerializer
     queryset = Blog.objects.all()
     lookup_field = "slug"
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            blog_name = instance.name 
+            instance.delete()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="Deleted a blog",
+                    instance=blog_name
+                )
+            except Exception:
+                pass
 
 
     
