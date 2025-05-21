@@ -133,3 +133,4 @@ class AdminDetailMessageView(RetrieveAPIView):
     queryset = TicketMessage.objects.all()
     serializer_class = TicketMessageSerializer
     lookup_field = 'slug'
+    
