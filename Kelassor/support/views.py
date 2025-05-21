@@ -10,6 +10,7 @@ from rest_framework import viewsets
 from .models import Ticket, TicketMessage
 from account.views import CustomPagination
 from django.http import Http404
+from account.utils.logging import log_admin_activity
 from rest_framework.exceptions import ValidationError
 from rest_framework import status, serializers
 from rest_framework.response import Response
@@ -117,10 +118,16 @@ class AdminResponseMessageView(UpdateAPIView):
     serializer_class = AdminEditableTicketMessageSerializer
     lookup_field = 'slug'
     def perform_update(self, serializer):
-        return serializer.save(
-            admin=self.request.user
-        )
-    
+        with transaction.atomic():
+            message = serializer.save(admin=self.request.user)
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="updated ticket message",
+                    instance=f"TicketMessage ID: {message.id}, Slug: {getattr(message, 'slug', 'N/A')}"
+                )
+            except Exception:
+                pass
   
 
 
