@@ -76,7 +76,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     birthday = models.DateField(null=True, blank=True)
     about_me = models.TextField(null=True, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
-    national_id = models.CharField(max_length=10, unique=True, validators=[validate_iranian_national_id])
+    national_id = models.CharField(max_length=10, unique=True, null=True, blank=True,validators=[validate_iranian_national_id])
 
     GENDER_TYPE = (
         ("female", "FEMALE"),

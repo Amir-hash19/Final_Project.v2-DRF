@@ -134,3 +134,6 @@ class AdminDetailMessageView(RetrieveAPIView):
     serializer_class = TicketMessageSerializer
     lookup_field = 'slug'
     
+
+
+
