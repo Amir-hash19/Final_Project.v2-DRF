@@ -21,7 +21,7 @@ from .filters import CategoryBlogFilter
 #اضافه کردن دسته بندی توسط سوپریوزر و پنل ادمین
 class AddCategoryBlogView(CreateAPIView):
     queryset = CategoryBlog.objects.all()
-    permission_classes = [IsAuthenticated, create_permission_class(["support.add_categoryblog"])]
+    permission_classes = [IsAuthenticated, create_permission_class(["blog.add_categoryblog"])]
     serializer_class = BlogCategorySerializer
 
 
@@ -31,7 +31,7 @@ class AddCategoryBlogView(CreateAPIView):
 class UploadBlogView(CreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = UploadBlogSerializer
-    permission_classes = [IsAuthenticated, create_permission_class(["support.add_blog"])]
+    permission_classes = [IsAuthenticated, create_permission_class(["blog.add_blog"])]
    
 
     def perform_create(self, serializer):
@@ -47,7 +47,7 @@ class UploadBlogView(CreateAPIView):
 #test passed
 class DeleteCategoryBlogView(DestroyAPIView):
     queryset = CategoryBlog.objects.all()
-    permission_classes = [IsAuthenticated, create_permission_class(["support.delete_categoryblog"])]
+    permission_classes = [IsAuthenticated, create_permission_class(["blog.delete_categoryblog"])]
     serializer_class = BlogCategorySerializer
     lookup_field = 'slug'
 
@@ -58,7 +58,7 @@ class DeleteCategoryBlogView(DestroyAPIView):
 #test passed
 class ListCateogryBlogView(ListAPIView):
     queryset = CategoryBlog.objects.all().order_by("-date_created")
-    permission_classes = [IsAuthenticated, create_permission_class(["support.view_categoryblog"])]
+    permission_classes = [IsAuthenticated, create_permission_class(["blog.view_categoryblog"])]
     serializer_class = BlogCategorySerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -71,7 +71,7 @@ class ListCateogryBlogView(ListAPIView):
 #test passed
 class EditBlogView(UpdateAPIView):
     serializer_class = UploadBlogSerializer
-    permission_classes = [IsAuthenticated, create_permission_class(["support.change_blog"])]
+    permission_classes = [IsAuthenticated, create_permission_class(["blog.change_blog"])]
     queryset = Blog.objects.all()
     lookup_field = 'slug'
 
@@ -83,7 +83,7 @@ class EditBlogView(UpdateAPIView):
 
 #test passed
 class DeleteBlogView(DestroyAPIView):
-    permission_classes = [IsAuthenticated, create_permission_class(["support.delete_blog"])]
+    permission_classes = [IsAuthenticated, create_permission_class(["blog.delete_blog"])]
     serializer_class = UploadBlogSerializer
     queryset = Blog.objects.all()
     lookup_field = "slug"
@@ -123,7 +123,7 @@ class ListBlogView(ListAPIView):
 #test passed
 class AdminListBlogView(ListAPIView):
     queryset = Blog.objects.all().order_by("-date_added")
-    permission_classes = [IsAuthenticated, create_permission_class(["support.view_blog"])]
+    permission_classes = [IsAuthenticated, create_permission_class(["blog.view_blog"])]
     serializer_class = BlogSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -136,6 +136,7 @@ class AdminListBlogView(ListAPIView):
 
 
 class BlogDownloadView(APIView):
+    permission_classes = [AllowAny]
     def get(self, request, slug, format=None):
         try:
             blog = Blog.objects.get(slug=slug)

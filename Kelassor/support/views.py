@@ -137,3 +137,26 @@ class AdminDetailMessageView(RetrieveAPIView):
 
 
 
+class ListTicketMessageView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TicketMessageSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["message", "title"]
+    filterset_fields = ["created_at", "message_status"]
+    ordering_fields = ["created_at"]    
+
+    def get_queryset(self):
+        return TicketMessage.objects.filter(sender=self.request.user)
+
+
+
+
+
+class DetailTicketMessageView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TicketMessageSerializer
+    lookup_field = "slug"
+    def get_queryset(self):
+        return TicketMessage.objects.filter(sender=self.request.user)
+
+    
