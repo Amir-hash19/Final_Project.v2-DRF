@@ -123,31 +123,16 @@ class LogOutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        try:
-            refresh_token = request.data.get('refresh_token')
-            if not refresh_token:
-                return Response({"detail": "Refresh token is required."}, status=400)
+        refresh_token = request.data.get('refresh_token')
+        if not refresh_token:
+            return Response({"detail": "Refresh token is required."}, status=400)
 
+        try:
             token = RefreshToken(refresh_token)
             token.blacklist()
-
-            # ثبت لاگ اگر کاربر عضو supportpanel بود
-            user = request.user
-            if is_supportpanel_user(user):
-                AdminActivityLog.objects.create(
-                    user=user,
-                    action="Logout",
-                    detail="User manually logged out",
-                    ip_address=request.META.get("REMOTE_ADDR"),
-                    user_agent=request.META.get("HTTP_USER_AGENT")
-                )
-
             return Response({"detail": "User Logged Out Successfully!"})
-        except Exception as e:
+        except Exception:
             return Response({"detail": "Error during logout, please try again later."}, status=500)
-
-
-
 
 
 
