@@ -1,6 +1,7 @@
 from django.db import models
 from account.models import CustomUser
 from bootcamp.models import Bootcamp
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 
@@ -29,9 +30,9 @@ class Ticket(models.Model):
 
 
 class TicketMessage(models.Model):
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, related_name="customer_sender")
-
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, null=True, blank=True,related_name='messages')
+    sender = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, null=True, blank=True,related_name="customer_sender")
+    user_phone = PhoneNumberField(unique=True, region='IR', null=True, blank=True)
     MESSAGE_STATUS_CHOICES = (
         ("pending", "Pending"),
         ("answered", "Answered"),

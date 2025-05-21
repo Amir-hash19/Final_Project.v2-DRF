@@ -79,14 +79,20 @@ WSGI_APPLICATION = 'Kelassor.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config('DB_NAME'),
-        "USER": config('DB_USER'),
-        "PASSWORD": config('DB_PASSWORD'),
+        "NAME": 'kelassor',
+        "USER": 'admin',
+        "PASSWORD": 'amir112233',
         "HOST": "localhost",
         "PORT": "5432",
     }
 }
 
+
+# "NAME": config('DB_NAME'),
+# "USER": config('DB_USER'),
+# "PASSWORD": config('DB_PASSWORD'),
+# "HOST": "localhost",
+# "PORT": "5432",
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
