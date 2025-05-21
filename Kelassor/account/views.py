@@ -241,15 +241,6 @@ class VerifyOTPView(APIView):
 
                 refresh = RefreshToken.for_user(user)
 
-                if is_supportpanel_user(user):
-                    AdminActivityLog.objects.create(
-                        admin_user=user,
-                        action="Login via OTP",
-                        detail="User Successfully logged in using OTP",
-                        ip_address=request.META.get("REMOTE_ADDR"),
-                        user_agent=request.META.get("HTTP_USER_AGENT")
-
-                    )
 
                 return Response({
                     "access": str(refresh.access_token),
