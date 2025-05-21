@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from account.permissions import GroupPermission, create_permission_class
 from account.views import CustomPagination
+from account.utils.logging import log_admin_activity
 from rest_framework import viewsets
 from .models import BootcampCategory, Bootcamp, BootcampRegistration, SMSLog
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
@@ -24,9 +25,21 @@ from django.db import transaction
 class AdminCreateBootcampView(CreateAPIView):
     permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.add_bootcamp"])]
     serializer_class = BootcampSerializer
+
     def get_queryset(self):
+        return Bootcamp.objects.all()
+
+    def perform_create(self, serializer):
         with transaction.atomic():
-            return Bootcamp.objects.all()
+            bootcamp = serializer.save()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="created bootcamp",
+                    instance=f"Bootcamp ID: {bootcamp.id}, Name: {bootcamp.name}"
+                )
+            except Exception:
+                pass
 
 
 
@@ -36,6 +49,18 @@ class AdminCreateCategoryView(CreateAPIView):
     permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.add_bootcampcategory"])]
     serializer_class = CategoryBootcampSerializer
     queryset = BootcampCategory.objects.all()
+
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            category = serializer.save()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="created bootcamp category",
+                    instance=f"Category ID: {category.id}, Name: {category.name}"
+                )
+            except Exception:
+                pass
     
 
 
@@ -45,7 +70,18 @@ class AdminEditCategoryView(UpdateAPIView):
     serializer_class = CategoryBootcampSerializer
     queryset = BootcampCategory.objects.all()
     lookup_field = 'slug'
-    
+
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            category = serializer.save()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="updated bootcamp category",
+                    instance=f"Category ID: {category.id}, Name: {category.name}"
+                )
+            except Exception:
+                pass
 
 
 #test passed
@@ -54,6 +90,19 @@ class AdminDeleteCategoryView(DestroyAPIView):
     serializer_class = CategoryBootcampSerializer
     queryset = BootcampCategory.objects.all()
     lookup_field = 'slug'
+
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            category_name = instance.name
+            instance.delete()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="deleted bootcamp category",
+                    instance=category_name
+                )
+            except Exception:
+                pass
 
 
 
@@ -65,6 +114,19 @@ class AdminEditBootCampView(UpdateAPIView):
     queryset = Bootcamp.objects.all()
     lookup_field = 'slug'
 
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            bootcamp = serializer.save()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="updated bootcamp",
+                    instance=f"Bootcamp ID: {bootcamp.id}, Name: {bootcamp.name}"
+                )
+            except Exception:
+                pass
+
+
 
 
 
@@ -74,6 +136,20 @@ class AdminDeleteBootCampView(DestroyAPIView):
     serializer_class = BootcampSerializer
     queryset = Bootcamp.objects.all()
     lookup_field = 'slug'
+
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            bootcamp_name = instance.name
+            instance.delete()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="deleted bootcamp",
+                    instance=bootcamp_name
+                )
+            except Exception:
+                pass
+
 
 
 
@@ -177,17 +253,26 @@ class ListBootCampRegistrationView(ListAPIView):
 
 
 #test passed
-class CheckRegistraionStatusView(UpdateAPIView):
+class CheckRegistrationStatusView(UpdateAPIView):
     permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.change_bootcampregistration"])]
     queryset = BootcampRegistration.objects.all()
     serializer_class = AdminBootcampRegistrationSerializer
     lookup_field = 'slug'
 
     def perform_update(self, serializer):
-        serializer.save(
-            reviewed_by=self.request.user, reviewed_at=timezone.now()
-        )
-        
+        with transaction.atomic():
+            registration = serializer.save(
+                reviewed_by=self.request.user,
+                reviewed_at=timezone.now()
+            )
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="reviewed bootcamp registration",
+                    instance=f"Registration ID: {registration.id}, User: {registration.user.username}"
+                )
+            except Exception:
+                pass
 
 
 #test passed
@@ -239,7 +324,7 @@ class DeleteSMSLogView(DestroyAPIView):
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser", "SupportPanel")]
     queryset = SMSLog.objects.all()
     serializer_class = SMSLogSerializer
-
+    lookup_field = "slug"
 
 
 
