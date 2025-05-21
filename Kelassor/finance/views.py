@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status 
 from account.views import CustomPagination
 from rest_framework.filters import SearchFilter, OrderingFilter
+from account.utils.logging import log_admin_activity
 from django_filters.rest_framework import DjangoFilterBackend
 from account.views import CustomPagination
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -23,11 +24,23 @@ from django.db.models import Count
 #test passed
 class CreateInvoiceView(CreateAPIView):
     permission_classes = [IsAuthenticated, create_permission_class(["finance.add_invoice"])]
-    # queryset = Invoice.objects.all()
+    queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
+
     def get_queryset(self):
+        return Invoice.objects.all()
+
+    def perform_create(self, serializer):
         with transaction.atomic():
-            return Invoice.objects.all()
+            invoice = serializer.save()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="created invoice",
+                    instance=f"Invoice ID: {invoice.id}, Amount: {getattr(invoice, 'amount', 'N/A')}"
+                )
+            except Exception:
+                pass
 
 
 
@@ -53,6 +66,20 @@ class DeleteInvoiceView(DestroyAPIView):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer     
     lookup_field = 'slug'   
+
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            invoice_id = instance.id  # ذخیره شناسه قبل از حذف
+            instance.delete()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="deleted invoice",
+                    instance=f"Invoice ID: {invoice_id}"
+                )
+            except Exception:
+                pass
+
 
 
 #test passed
@@ -142,8 +169,17 @@ class EditInvoicesView(UpdateAPIView):
     serializer_class = InvoiceUpdateSerializer
     lookup_field = 'slug'
 
-
-
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            invoice = serializer.save()
+            try:
+                log_admin_activity(
+                    request=self.request,
+                    action="updated invoice",
+                    instance=f"Invoice ID: {invoice.id}, Amount: {getattr(invoice, 'amount', 'N/A')}"
+                )
+            except Exception:
+                pass
 
 
 #test passed
