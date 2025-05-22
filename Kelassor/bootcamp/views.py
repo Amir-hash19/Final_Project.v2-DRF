@@ -23,6 +23,7 @@ from django.db import transaction
 
 #test passed
 class AdminCreateBootcampView(CreateAPIView):
+    """ ساختن بوت کمپ توسط پنل ادمین و سوپر یوزر"""
     permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.add_bootcamp"])]
     serializer_class = BootcampSerializer
 
@@ -46,6 +47,7 @@ class AdminCreateBootcampView(CreateAPIView):
 
 #test passed
 class AdminCreateCategoryView(CreateAPIView):
+    """ ساختن دسته بندی بوت کمپ توسط پنل ادمین و سوپر یوزر"""
     permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.add_bootcampcategory"])]
     serializer_class = CategoryBootcampSerializer
     queryset = BootcampCategory.objects.all()
@@ -321,6 +323,7 @@ class ListSMSLogView(ListAPIView):
 
 #test passed
 class DeleteSMSLogView(DestroyAPIView):
+    """ پاک کردن لاگ های دیتابیس برای بالا بردن کیفیت """
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser", "SupportPanel")]
     queryset = SMSLog.objects.all()
     serializer_class = SMSLogSerializer

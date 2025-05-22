@@ -43,6 +43,7 @@ class AddCategoryBlogView(CreateAPIView):
 
 #test passed
 class UploadBlogView(CreateAPIView):
+    """  ساختن وبلاگ توسط ادمین با دسترسی و ثبت لاگ برای رصد فعالیت های کاربر پنل """
     queryset = Blog.objects.all()
     serializer_class = UploadBlogSerializer
     permission_classes = [IsAuthenticated, create_permission_class(["blog.add_blog"])]
@@ -90,6 +91,7 @@ class DeleteCategoryBlogView(DestroyAPIView):
 
 #test passed
 class ListCateogryBlogView(ListAPIView):
+    """لیست دسته بندی ها های وبلاگ ها"""
     queryset = CategoryBlog.objects.all().order_by("-date_created")
     permission_classes = [IsAuthenticated, create_permission_class(["blog.view_categoryblog"])]
     serializer_class = BlogCategorySerializer

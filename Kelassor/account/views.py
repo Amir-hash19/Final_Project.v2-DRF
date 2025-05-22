@@ -33,6 +33,9 @@ class CustomPagination(PageNumberPagination):
 
 
 class CreateGroupWithPermissions(APIView):
+    """
+    ساختن گروه  فقط با دسترسی سوپر یوزر قابل انجام هست این ویو یه گروه میسازه و یه لیست از دسترسی ها رو میگیره 
+    """
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser")]
 
     def post(self, request):
@@ -63,6 +66,9 @@ class CreateGroupWithPermissions(APIView):
 
 
 class GroupedPermissionListAPI(APIView):
+    """
+    برای ساختن گروه کاربر باید بتونه یه لیستی از دسترسی ها رو ببینه تا به گروه اضافه کن این کاربر با دادن اسم کد  دسترسی قابل انجام هست
+    """
     permission_classes = [GroupPermission("SuperUser")]
 
     def get(self, request):
@@ -88,6 +94,7 @@ class GroupedPermissionListAPI(APIView):
 #test passed
 #ساختن اکانت عادی برای کاربر نرمال 
 class RegisterAccountView(APIView):
+    """امکان ساختن اکانت برای کاربر و دریافت توکن بعد از ساختن همچنین برای جلوگیری از ذخیره اطلاعات ناقص از رول بک استفاده شده"""
     permission_classes = [AllowAny]
     def post(self, request):
         with transaction.atomic():
@@ -110,6 +117,7 @@ class RegisterAccountView(APIView):
 #test passed
 #ویرایش اکانت برای کاربر عادی
 class EditAccountView(UpdateAPIView):
+    """ کاربر میتونه اکانت خودشو ادیت کنه اگه اهراز هویت شده باشه """
     permission_classes = [IsAuthenticated]
     serializer_class = EditAccountSerializer
 
@@ -137,6 +145,7 @@ class LogOutView(APIView):
 
 
 class DeleteAccountView(DestroyAPIView):
+    """ در جنگو پاک کردن نداریم"""
     permission_classes = [IsAuthenticated]
     serializer_class = CustomAccountSerializer
 
@@ -147,6 +156,7 @@ class DeleteAccountView(DestroyAPIView):
 
 #test passed
 class DetailAccountView(RetrieveAPIView):
+    """ کاربر میتونه اکانت خودشو ببینه  کنه اگه اهراز هویت شده باشه """
     permission_classes = [IsAuthenticated]
     serializer_class = CustomAccountSerializer
 
@@ -159,6 +169,7 @@ class DetailAccountView(RetrieveAPIView):
 
 #test passed
 class ListSupportAccountView(ListAPIView):
+    """همچنین کاربر سوپر یوزر میتونه لیستی از کاربران پنل ببینه """
     queryset = CustomUser.objects.filter(groups__name__in=["SupportPanel"]).order_by("-date_joined")
     permission_classes = [IsAuthenticated,create_permission_class(["support.view_customuser"])]
     serializer_class = SupportPanelSerializer
@@ -173,6 +184,7 @@ class ListSupportAccountView(ListAPIView):
 
 
 class SendOTPLogInView(APIView):
+    """ارسال کد یک بار مصرف برای ورود به سایت و دریافت توکن"""
     permission_classes = [AllowAny]
     throttle_classes = [OTPThrottle]
 
@@ -246,6 +258,7 @@ class VerifyOTPView(APIView):
 
 
 class PromoteUserView(APIView):
+    """امکان دادن دسترسی با اضافه کردن کاربر به گروه خاص"""
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser")]
 
     
@@ -309,7 +322,7 @@ class DeleteSupportPanelView(DestroyAPIView):
 
 
 class AdminLogOutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,GroupPermission("SuperUser", "SupportPanel")]
     def post(self, request):
         try:
             refresh_token = request.data.get('refresh_token')
@@ -326,6 +339,7 @@ class AdminLogOutView(APIView):
 
 #test passed
 class ListAdminActivityLogView(ListAPIView):
+    """دیدن لیستی از فعالیت های چند ساعت اخیر کاربر عضو گروه پنل"""
     serializer_class = AdminActivityLogSerializer
     permission_classes = [IsAuthenticated, GroupPermission("SuperUser")]
     pagination_class = CustomPagination

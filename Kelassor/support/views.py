@@ -25,6 +25,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 #test passed
 class CreateTickectView(CreateAPIView):
+    """ساختن تیکت توسط کاربر"""
     # queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     permission_classes = [AllowAny]
@@ -57,7 +58,7 @@ class ListTicketView(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["title", "slug"]
     filterset_fields = ["created_at", "status"]
-    ordering_fields = ["-created_at"]
+    ordering_fields = ["created_at"]
     def get_queryset(self):   
         return Ticket.objects.filter(user=self.request.user).order_by("-create_at")
     

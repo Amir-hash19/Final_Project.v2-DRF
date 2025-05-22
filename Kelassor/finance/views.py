@@ -23,6 +23,7 @@ from django.db.models import Count
 
 #test passed
 class CreateInvoiceView(CreateAPIView):
+    """ساختن فاکتور برای کاربر توسط پنل ادمین"""
     permission_classes = [IsAuthenticated, create_permission_class(["finance.add_invoice"])]
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
@@ -47,13 +48,14 @@ class CreateInvoiceView(CreateAPIView):
 
 #test passed
 class ListUserWithInvoiceView(ListAPIView):
+    """لیست کاربران بدونه فاکتور """
     permission_classes = [IsAuthenticated, create_permission_class(["finance.view_invoice"])]
     serializer_class = BasicUserSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     pagination_class = CustomPagination
     search_fields = ["username", "email", "phone"]
     filterset_fields = ["gander", "date_added"]
-    ordering_fields = ["-date_added"]
+    ordering_fields = ["date_added"]
 
 
     def get_queryset(self):
@@ -141,7 +143,7 @@ class ListPaymentView(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["amount", "invoice"]
     filterset_fields = ["method", "paid_at"]
-    ordering_fields = ["-paid_at"]
+    ordering_fields = ["paid_at"]
     pagination_class = CustomPagination
     
     def get_queryset(self):
@@ -150,12 +152,13 @@ class ListPaymentView(ListAPIView):
 
 #test passed
 class ListTransactionView(ListAPIView):
+    """لیست تراکنش های کاربر """
     permission_classes = [IsAuthenticated]
     serializer_class = TransactionSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["description", "amount"]
     filterset_fields = ["transaction_type", "transaction_date"]
-    ordering_fields = ["-transaction_date"]
+    ordering_fields = ["transaction_date"]
     pagination_class = CustomPagination
     
     def get_queryset(self):
@@ -190,7 +193,7 @@ class ListInvoiceUserView(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["description", "amount"]
     filterset_fields = ["is_paid", "created_at"]
-    ordering_fields = ["-created_at"]
+    ordering_fields = ["created_at"]
 
 
     def get_queryset(self):
