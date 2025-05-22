@@ -31,7 +31,6 @@ class AdminCreateBootcampView(CreateAPIView):
         return Bootcamp.objects.all()
 
     def perform_create(self, serializer):
-        with transaction.atomic():
             bootcamp = serializer.save()
             try:
                 log_admin_activity(
@@ -74,7 +73,7 @@ class AdminEditCategoryView(UpdateAPIView):
     lookup_field = 'slug'
 
     def perform_update(self, serializer):
-        with transaction.atomic():
+ 
             category = serializer.save()
             try:
                 log_admin_activity(
@@ -94,7 +93,7 @@ class AdminDeleteCategoryView(DestroyAPIView):
     lookup_field = 'slug'
 
     def perform_destroy(self, instance):
-        with transaction.atomic():
+  
             category_name = instance.name
             instance.delete()
             try:
@@ -117,7 +116,7 @@ class AdminEditBootCampView(UpdateAPIView):
     lookup_field = 'slug'
 
     def perform_update(self, serializer):
-        with transaction.atomic():
+
             bootcamp = serializer.save()
             try:
                 log_admin_activity(
@@ -140,7 +139,7 @@ class AdminDeleteBootCampView(DestroyAPIView):
     lookup_field = 'slug'
 
     def perform_destroy(self, instance):
-        with transaction.atomic():
+
             bootcamp_name = instance.name
             instance.delete()
             try:
