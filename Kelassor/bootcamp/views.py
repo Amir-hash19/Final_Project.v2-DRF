@@ -253,7 +253,7 @@ class ListBootCampRegistrationView(ListAPIView):
 
 
 #test passed
-class CheckRegistrationStatusView(UpdateAPIView):
+class CheckRegistraionStatusView(UpdateAPIView):
     permission_classes = [IsAuthenticated, create_permission_class(["bootcamp.change_bootcampregistration"])]
     queryset = BootcampRegistration.objects.all()
     serializer_class = AdminBootcampRegistrationSerializer
