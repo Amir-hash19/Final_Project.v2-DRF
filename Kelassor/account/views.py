@@ -346,7 +346,7 @@ class ListAdminActivityLogView(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["action", "detail", "admin_user__username", "admin_user__phone"]
     filterset_fields = ["created_at"]
-    ordering_fields = ["-created_at"]
+    ordering_fields = ["created_at"]
 
 
 

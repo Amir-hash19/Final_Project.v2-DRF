@@ -14,7 +14,7 @@ def log_admin_activity(request, action, instance=None):
         return
 
     # فقط اگر کاربر عضو گروه supportpanel بود لاگ ثبت می‌کنه
-    if not user.groups.filter(name="supportpanel").exists():
+    if not user.groups.filter(name="SupportPanel").exists():
         return
 
     ip = get_client_ip(request)

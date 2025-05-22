@@ -89,11 +89,17 @@ DATABASES = {
 }
 
 
-# "NAME": config('DB_NAME'),
-# "USER": config('DB_USER'),
-# "PASSWORD": config('DB_PASSWORD'),
-# "HOST": "localhost",
-# "PORT": "5432",
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": config('DB_NAME'),
+#         "USER": config('DB_USER'),
+#         "PASSWORD": config('DB_PASSWORD'),
+#         "HOST": config('DB_HOST'),
+#         "PORT": config('DB_PORT'),
+#     }
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -174,6 +180,15 @@ SIMPLE_JWT = {
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
+
+
+# REDIS_HOST = config('REDIS_HOST', default='localhost')
+# REDIS_PORT = config('REDIS_PORT', default='6379')
+
+# CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
+# CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/1'
+
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -197,6 +212,16 @@ CACHES = {
 }
 
 
+
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/1",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
+#     }
+# }
 
 
 
