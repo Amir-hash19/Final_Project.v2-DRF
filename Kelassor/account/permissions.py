@@ -14,8 +14,6 @@ def GroupPermission(*group_names):
 
 
 
-
-
 def is_supportpanel_user(user):
     return user.groups.filter(name="SupportPanel").exists()
 
