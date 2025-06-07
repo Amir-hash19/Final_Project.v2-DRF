@@ -19,12 +19,3 @@
 - Django 4.2 یا بالاتر
 - Docker و Docker Compose (در صورت استفاده از Docker)
 
-## نصب و اجرا
-
-### روش اول: اجرای محلی
-
-1. مخزن را کلون کنید:
-
-   ```bash
-   git clone https://github.com/Amir-hash19/Final_Project.v2-DRF.git
-   cd Final_Project.v2-DRF
