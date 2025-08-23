@@ -89,8 +89,6 @@ class GroupedPermissionListAPI(APIView):
 
 
 
-
-
 #test passed
 #ساختن اکانت عادی برای کاربر نرمال 
 class RegisterAccountView(APIView):

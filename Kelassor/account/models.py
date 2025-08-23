@@ -50,11 +50,6 @@ class CustomUserManager(BaseUserManager):
 def validate_username_with_special_characters(value):
     if re.match(r'^[a-zA-Z0-9]*$', value):
         raise ValidationError("Username must contain at least one special charactes")
-
-
-def validate_iranian_national_id(value):
-    if not value.isdigit() or len(value) != 10:
-        raise ValidationError("National ID must be exactly 10 digits.")
     
     check = int(value[-1])
     s = sum(int(value[i]) * (10 - i) for i in range(9))

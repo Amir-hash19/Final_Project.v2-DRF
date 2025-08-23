@@ -146,7 +146,7 @@ class RegisterAccountViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("group", response.data)
         self.assertEqual(str(response.data["group"][0]), "Group field should not be included in registration data.")
-  
+
 
 
 
