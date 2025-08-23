@@ -21,24 +21,10 @@
 
 ## نصب و اجرا
 
-### روش اجرای محلی
+### روش اول: اجرای محلی
 
 1. مخزن را کلون کنید:
 
    ```bash
    git clone https://github.com/Amir-hash19/Final_Project.v2-DRF.git
    cd Final_Project.v2-DRF
-
-
-
-2. نصب requerments.txt 
-   
-   ```bash  
-   pip install -r requirements.txt 
-
-
-
-3. اجرای سرویس
-
-```bash
-python manage.py runserver
