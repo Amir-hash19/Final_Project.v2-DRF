@@ -38,10 +38,20 @@
    pip install -r requirements.txt 
 
 
+4. اجرای celery
+   ‍‍
+   ```bash
+   celery -A Kelassor worker -l info
+
+
 
 3. اجرای سرویس
 
 ```bash
 python manage.py runserver
+
+
+
+
 
 
