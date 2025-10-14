@@ -1,57 +1,99 @@
-# پروژه نهایی با Django REST Framework
+# 🚀 Django REST API Platform
+❤️ For kelaasor platform 
 
-## معرفی
+A scalable and modular backend built with **Django REST Framework**, featuring **JWT authentication**, **Redis caching**, **Celery background tasks**, and multiple apps including **User Account**, **Bootcamp**, **Ticket**, **Support**, and **Blog**.
 
-این پروژه یک نمونه‌ی کامل از پیاده‌سازی API با استفاده از Django و Django REST Framework (DRF) است. هدف از این پروژه، ارائه‌ی یک ساختار تمیز، قابل توسعه و مستند برای توسعه‌دهندگان است.
+![Demo](https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGpuanNhc2g3ZDJrMXkzdGc3NjlqdWpvdTAxeWdnM2FsbmloMmNmNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/5XnfRp2sTnw1qYdLUV/giphy.gif)
 
-## ویژگی‌ها
+# 🧠 Django REST Backend System
 
-- استفاده از Django و Django REST Framework برای ساخت APIهای قدرتمند
-- ساختار پروژه‌ی تمیز و قابل فهم
-- استفاده از Docker برای سهولت در استقرار
-- مستندسازی API با استفاده از Swagger
-- پشتیبانی از احراز هویت و مجوزها
-- پوشش تست‌های واحد برای اطمینان از عملکرد صحیح
-
-## پیش‌نیازها
-
-- Python 3.9 یا بالاتر
-- Django 4.2 یا بالاتر
-- Docker و Docker Compose (در صورت استفاده از Docker)
-
-
-## نصب و اجرا
-
-### روش اجرای محلی
-
-1. مخزن را کلون کنید:
-
-   ```bash
-   git clone https://github.com/Amir-hash19/Final_Project.v2-DRF.git
-   cd Final_Project.v2-DRF
+A production-ready Django REST API project with:
+- 🔐 JWT authentication  
+- ⚙️ Rate limiting  
+- ⚡ Redis caching  
+- 🔁 Celery background tasks  
+- 🧩 Modular apps: useraccount, bootcamp, ticket, support, and blog
 
 
 
-2. نصب requerments.txt 
-   
-   ```bash  
-   pip install -r requirements.txt 
+
+## 🧰 Technologies Used
+
+This project is built using modern and production-ready technologies to ensure performance, scalability, and clean architecture.
+
+### ⚙️ Backend
+- 🐍 **Python 3.11**
+- 🧱 **Django 5.x**
+- ⚡ **Django REST Framework (DRF)** — for building robust RESTful APIs
+- 🔐 **JWT Authentication** — secure user authentication using JSON Web Tokens
+
+### 🧩 Apps
+- 👤 **UserAccount** — user management & authentication
+- 🎓 **Bootcamp** — training or course management
+- 🎟️ **Ticket** — ticketing & issue tracking system
+- 💬 **Support** — support chat / helpdesk functionality
+- 📰 **Blog** — article publishing & content management
+
+### 🚀 Performance & Optimization
+- 🧮 **Rate Limiting** — API request throttling using DRF throttles
+- ⚡ **Caching with Redis** — improving performance and response time
+- 🔁 **Background Tasks with Celery + Redis** — for async task processing (emails, notifications, etc.)
+
+### 🗄️ Database & Storage
+- 🐘 **PostgreSQL** — main relational database
+- 🧰 **Redis** — in-memory cache and message broker
+
+### 🧰 DevOps / Tools
+- 🐳 **Docker & Docker Compose** — containerized environment setup
+- 🧪 **Pytest / Django Test Framework** — testing and CI-ready setup
+- 🧹 **Black / isort / flake8** — code formatting and linting
+- ☁️ **Environment Variables (.env)** — secure configuration management
+
+---
+
+### 📦 Example Stack Overview
+```text
+Django + DRF  →  PostgreSQL  →  Redis  →  Celery  →  Docker
 
 
-4. اجرای celery
-   ‍‍
-   ```bash
-   celery -A Kelassor worker -l info
+## 🚀 How to Run
 
+You can run this Django REST Framework project either **locally** or using **Docker Compose**.
 
+---
 
-3. اجرای سرویس
+### 🧩 1️⃣ Run Locally (Development Mode)
+
+#### 🔹 Prerequisites
+Make sure you have installed:
+- Python 3.11+
+- PostgreSQL (or your configured database)
+- Redis (for cache & Celery)
+- pip or Poetry
+
+#### 🔹 Steps
 
 ```bash
+# 1. Clone the repository
+git clone https://github.com/yourusername/yourproject.git
+cd yourproject
+
+# 2. Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate    # On Windows: venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run migrations
+python manage.py migrate
+
+# 5. Create a superuser (optional)
+python manage.py createsuperuser
+
+# 6. Run Redis & Celery (in separate terminals)
+redis-server
+celery -A yourproject worker -l info
+
+# 7. Start the server
 python manage.py runserver
-
-
-
-
-
-

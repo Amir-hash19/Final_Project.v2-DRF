@@ -3,7 +3,9 @@ from .models import BootcampRegistration, Bootcamp, BootcampCategory
 from django.dispatch import receiver
 from django.utils.text import slugify
 from .tasks import send_sms_to_user
+from django.core.exceptions import ValidationError
 from django.db.models import F
+from django.db import transaction
 from datetime import datetime
 import uuid
 
@@ -44,9 +46,10 @@ def generate_slug_category(sender, instance, **kwargs):
 def check_capacity_bootcamp(sender, instance, created, **kwargs):
     if not created and instance.status == "approved":
         bootcamp = instance.bootcamp
-        if bootcamp.capacity > 0:
-            bootcamp.capacity -= 1
-            bootcamp.save()
+        with transaction.atomic():
+            updated = Bootcamp.objects.filter(id=bootcamp.id, capacity__gt=0).update(capacity=F("capacity")-1)
+            if not updated:
+                raise ValidationError(f"bootcamp {bootcamp.title} is full")
 
 
 
