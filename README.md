@@ -1,5 +1,7 @@
 # 🚀 Django REST API Platform
 ❤️ For kelaasor platform 
+## 📖 Reference
+- [Platform for learning ](https://kelaasor.com/)
 
 A scalable and modular backend built with **Django REST Framework**, featuring **JWT authentication**, **Redis caching**, **Celery background tasks**, and multiple apps including **User Account**, **Bootcamp**, **Ticket**, **Support**, and **Blog**.
 
