@@ -12,3 +12,4 @@ django-redis==5.4.0
 django-celery-beat==2.8.1
 django-anymail[mailgun]==10.2
 drf-yasg==1.21.10  
+jango-phonenumber-field
