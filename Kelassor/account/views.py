@@ -165,17 +165,15 @@ class DetailAccountView(RetrieveAPIView):
 
 
 
-#test passed
 class ListSupportAccountView(ListAPIView):
-    """همچنین کاربر سوپر یوزر میتونه لیستی از کاربران پنل ببینه """
     queryset = CustomUser.objects.filter(groups__name__in=["SupportPanel"]).order_by("-date_joined")
-    permission_classes = [IsAuthenticated,create_permission_class(["support.view_customuser"])]
+    permission_classes = [IsAuthenticated, create_permission_class(["support.view_customuser"])]
     serializer_class = SupportPanelSerializer
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["date_joined", "phone", "username", "last_name"]
-    filterset_fields = ["date_joined", "birthday"]
-    ordering_fields = ["-date_joined"]
+    filterset_fields = ["date_joined", "birthday"]  
+    ordering_fields = ["date_joined"]
 
 
 

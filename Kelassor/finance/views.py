@@ -54,9 +54,9 @@ class ListUserWithInvoiceView(ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     pagination_class = CustomPagination
     search_fields = ["username", "email", "phone"]
-    filterset_fields = ["gander", "date_added"]
-    ordering_fields = ["date_added"]
-
+    filterset_fields = ["gender"]
+    ordering_fields = ["date_joined"]
+    
 
     def get_queryset(self):
         return CustomUser.objects.annotate(invoice_count=Count('invoice')).filter(invoice_count__gt=0).order_by("-date_joined")
