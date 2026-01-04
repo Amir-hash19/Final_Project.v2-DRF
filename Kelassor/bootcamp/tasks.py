@@ -14,7 +14,7 @@ api = KavenegarAPI(settings.KAVENEGAR_API_KEY)
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=5, ignore_result=True)
-def send_sms_to_user(self, phone, full_name):#ارسال پیام به یوزر که ایا درخواستش قبول شده یا نه 
+def send_sms_to_user(self, phone, full_name):
     try:
         message = f"{full_name} The result of your registration just came! check website please !"
         params = {
@@ -64,7 +64,7 @@ def send_sms_notification(notification_id):
         notification.status = 'failed'
         notification.save()
     except ClassNotifications.DoesNotExist:
-        pass  # اگر نوتیفیکیشن پیدا نشد، نادیده بگیر
+        pass  
 
 
 

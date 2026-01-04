@@ -17,8 +17,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["*", "127.0.0.1", "localhost", "0.0.0.0"]
 
 # Application definition
 
@@ -83,7 +82,7 @@ DATABASES = {
         "NAME": 'kelassor',
         "USER": 'admin',
         "PASSWORD": 'amir112233',
-        "HOST": "localhost",
+        "HOST": "db",
         "PORT": "5432",
     }
 }
@@ -135,7 +134,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = '/app/staticfiles'
+
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -145,7 +148,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',  # استفاده از JWT
+        'rest_framework_simplejwt.authentication.JWTAuthentication', 
     ],
     "DEFAULT_THROTTLE_RATES": {
         "otp": "5/hour",
@@ -177,16 +180,9 @@ SIMPLE_JWT = {
 
 
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/1'
 
-
-
-# REDIS_HOST = config('REDIS_HOST', default='localhost')
-# REDIS_PORT = config('REDIS_PORT', default='6379')
-
-# CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
-# CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/1'
 
 
 CELERY_ACCEPT_CONTENT = ['json']
@@ -195,7 +191,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 
 
-CELERY_TIMEZONE = 'Asia/Tehran'  # یا هر تایم‌زون مورد نظر
+CELERY_TIMEZONE = 'Asia/Tehran'  
 CELERY_ENABLE_UTC = False
 
 
@@ -204,7 +200,7 @@ CELERY_ENABLE_UTC = False
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",  # مثلاً Redis DB شماره 1
+        "LOCATION": "redis://127.0.0.1:6379/1", 
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -213,24 +209,15 @@ CACHES = {
 
 
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/1",
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         }
-#     }
-# }
 
 
 
-CELERY_BEAT_SCHEDULE = {
-    'check-tickets-every-day': {
-        'task': 'tickets.tasks.check_and_update_ticket_status',
-        'schedule': 86400.0,
-    },
-}    
+# CELERY_BEAT_SCHEDULE = {
+#     'check-tickets-every-day': {
+#         'task': 'tickets.tasks.check_and_update_ticket_status',
+#         'schedule': 86400.0,
+#     },
+# }    
 
 
 

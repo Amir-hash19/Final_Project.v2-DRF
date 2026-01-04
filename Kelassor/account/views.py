@@ -241,7 +241,7 @@ class VerifyOTPView(APIView):
                 })
 
             else:
-                # افزایش شمارنده تلاش ناموفق
+              
                 current_fails = cache.get(fail_key, 0)
                 cache.set(fail_key, int(current_fails) + 1, timeout=BLOCK_TIME_SECONDS)
 
