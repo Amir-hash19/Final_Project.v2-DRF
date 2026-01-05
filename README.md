@@ -14,6 +14,7 @@ A production-ready Django REST API project with:
 - ⚙️ Rate limiting  
 - ⚡ Redis caching  
 - 🔁 Celery background tasks  
+- postgreSQL
 - 🧩 Modular apps: useraccount, bootcamp, ticket, support, and blog
 
 
@@ -57,45 +58,160 @@ This project is built using modern and production-ready technologies to ensure p
 ```text
 Django + DRF  →  PostgreSQL  →  Redis  →  Celery  →  Docker
 
+# Kelassor – Django REST Framework
 
-## 🚀 How to Run
-
-You can run this Django REST Framework project either **locally** or using **Docker Compose**.
+Production-ready Django REST Framework project, fully containerized with Docker Compose. This setup is designed for **consistent development**, **team collaboration**, and **production-like environments**.
 
 ---
 
-### 🧩 1️⃣ Run Locally (Development Mode)
+## 🚀 Quick Start (Docker Compose – Recommended)
 
-#### 🔹 Prerequisites
-Make sure you have installed:
-- Python 3.11+
-- PostgreSQL (or your configured database)
-- Redis (for cache & Celery)
-- pip or Poetry
+This project runs **exclusively via Docker Compose**. No local Python, PostgreSQL, or Redis installation is required.
 
-#### 🔹 Steps
+### Prerequisites
+
+* Docker (v20+)
+* Docker Compose (v2+)
+
+Verify installation:
+
+```bash
+docker --version
+docker compose version
+```
+
+---
+
+## ▶️ Run the Project
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/yourproject.git
-cd yourproject
+git clone https://github.com/Amir-hash19/Final_Project.v2-DRF.git
+cd Kelassor
 
-# 2. Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate    # On Windows: venv\Scripts\activate
+# 2. Create environment file
+cp .env.example .env
 
-# 3. Install dependencies
-pip install -r requirements.txt
+# 3. Build and start services
+docker-compose up --build
+```
 
-# 4. Run migrations
-python manage.py migrate
+This will start all required services automatically.
 
-# 5. Create a superuser (optional)
-python manage.py createsuperuser
+---
 
-# 6. Run Redis & Celery (in separate terminals)
-redis-server
-celery -A yourproject worker -l info
+## 🌐 Application Access
 
-# 7. Start the server
-python manage.py runserver
+* API: [http://localhost:8000](http://localhost:8000)
+* Admin Panel: [http://localhost:8000/admin](http://localhost:8000/admin)
+
+---
+
+## 🧱 Services Architecture
+
+```
++-------------+        +-------------+
+|   Client    | -----> |   Django    |
+| (Browser /  |        |   REST API  |
+|  Mobile)    |        +------+------+ 
++-------------+               |
+                              |
+        +---------------------+---------------------+
+        |                     |                     |
++-------v-------+     +-------v-------+     +-------v-------+
+| PostgreSQL DB |     |     Redis     |     |   Celery      |
+|   (Data)     |     | (Cache/Broker)|     |   Workers     |
++---------------+     +---------------+     +---------------+
+```
+
+---
+
+## ⚙️ Environment Variables
+
+All configuration is managed via environment variables.
+
+Create a `.env` file based on `.env.example`.
+
+### Required Variables
+
+```env
+# Django
+DJANGO_SECRET_KEY=your-secret-key
+DJANGO_DEBUG=False
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Database
+POSTGRES_DB=kelassor
+POSTGRES_USER=kelassor
+POSTGRES_PASSWORD=kelassor
+POSTGRES_HOST=db
+POSTGRES_PORT=5432
+
+# Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+# Celery
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+```
+
+⚠️ **Never commit `.env` files to version control.**
+
+---
+
+## 🛠 Common Commands
+
+### Django Management
+
+```bash
+docker-compose exec app python manage.py migrate
+docker-compose exec app python manage.py createsuperuser
+docker-compose exec app python manage.py collectstatic
+```
+
+### Code Formatting
+
+```bash
+docker-compose exec app isort .
+docker-compose exec app black .
+```
+
+### Stop Services
+
+```bash
+docker-compose down
+```
+
+---
+
+## 🧪 Development Notes
+
+* Source code is mounted as a Docker volume (hot reload enabled)
+* Static files are collected automatically on startup
+* Celery workers run as separate services
+* Formatting is enforced using **Black + isort**
+
+---
+
+## 🚫 Local (Non-Docker) Execution
+
+Running the project outside Docker is **not supported**.
+
+Docker Compose is the single source of truth for development and deployment.
+
+---
+
+## 📦 Tech Stack
+
+* Django & Django REST Framework
+* PostgreSQL
+* Redis
+* Celery
+* Docker & Docker Compose
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
