@@ -47,20 +47,10 @@ class CustomUserManager(BaseUserManager):
     
 
 
-def validate_username_with_special_characters(value):
-    if re.match(r'^[a-zA-Z0-9]*$', value):
-        raise ValidationError("Username must contain at least one special charactes")
-    
-    check = int(value[-1])
-    s = sum(int(value[i]) * (10 - i) for i in range(9))
-    r = s % 11
-
-    if (r < 2 and check != r) or (r >= 2 and check != (11 - r)):
-        raise ValidationError("Invalid national ID.")
     
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=150, validators=[validate_username_with_special_characters],unique=True)
+    username = models.CharField(max_length=150, unique=True)
     password = models.CharField(max_length=128, null=True, blank=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=80)
